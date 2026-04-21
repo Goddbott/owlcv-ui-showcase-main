@@ -1,12 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
-import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Github } from "lucide-react";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useState, useMemo, useEffect } from "react";
+import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Github, Save } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
 import { useResume, ResumeData, Experience, Project, Education } from "@/hooks/use-resume";
 import { GitHubImport } from "@/components/GitHubImport";
 import { AIEnhanceButton } from "@/components/AIEnhanceButton";
 import { CustomizationPanel } from "@/components/CustomizationPanel";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/editor/$id")({
   head: () => ({ meta: [{ title: "Resume Editor — OwlCV" }, { name: "description", content: "Edit your resume with AI suggestions." }] }),
@@ -17,9 +18,56 @@ const sections = ["Personal Info", "Work Experience", "Education", "Skills", "Pr
 type SectionType = typeof sections[number];
 
 function Editor() {
-  const { data, updatePersonal, addExperience, updateExperience, removeExperience, updateSkills, addProject, updateProject, setAccent, setTemplate } = useResume();
+  const { id } = Route.useParams();
+  const router = useRouter();
+  const { data, setData, updatePersonal, addExperience, updateExperience, removeExperience, updateSkills, addProject, updateProject, setAccent, setTemplate } = useResume();
   const [activeSection, setActiveSection] = useState<SectionType>("Personal Info");
   const [skillInput, setSkillInput] = useState("");
+  const [title, setTitle] = useState("Software Engineer Resume");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    async function loadResume() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.navigate({ to: "/signin" });
+        return;
+      }
+      if (id !== "new") {
+        const { data: resume } = await supabase.from("resumes").select("*").eq("id", id).single();
+        if (resume && resume.content) {
+          setData(resume.content);
+          setTitle(resume.title);
+        }
+      }
+    }
+    loadResume();
+  }, [id, router, setData]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    if (id === "new") {
+      const { data: inserted, error } = await supabase.from("resumes").insert({
+        user_id: session.user.id,
+        title,
+        content: data
+      }).select().single();
+      
+      if (inserted) {
+        router.navigate({ to: `/editor/${inserted.id}` });
+      }
+    } else {
+      await supabase.from("resumes").update({
+        title,
+        content: data,
+        updated_at: new Date().toISOString()
+      }).eq("id", id);
+    }
+    setSaving(false);
+  };
 
   const currentIndex = sections.indexOf(activeSection);
   const nextSection = () => {
@@ -61,10 +109,16 @@ function Editor() {
             
             <div className="flex items-center justify-between mt-3 group">
                <input 
-                 defaultValue="Software Engineer Resume" 
+                 value={title}
+                 onChange={(e) => setTitle(e.target.value)}
                  className="w-full rounded-lg border border-transparent bg-transparent text-2xl font-extrabold focus:border-primary focus:outline-none focus:px-2 transition-all" 
                />
-               <button className="opacity-0 group-hover:opacity-100 btn-ghost p-1.5"><Sparkles className="h-4 w-4 text-primary" /></button>
+               <div className="flex gap-2">
+                 <button onClick={handleSave} disabled={saving} className="btn-primary py-1.5 px-3 text-xs disabled:opacity-70 whitespace-nowrap">
+                   <Save className="h-3.5 w-3.5 mr-1" /> {saving ? "Saving..." : "Save"}
+                 </button>
+                 <button className="opacity-0 group-hover:opacity-100 btn-ghost p-1.5"><Sparkles className="h-4 w-4 text-primary" /></button>
+               </div>
             </div>
 
             {/* Section Stepper */}
