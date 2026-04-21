@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Camera, AlertTriangle } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — OwlCV" }, { name: "description", content: "Manage your account settings." }] }),
@@ -12,6 +13,17 @@ const tabs = ["Profile", "Password", "Notifications", "Danger Zone"] as const;
 
 function SettingsPage() {
   const [tab, setTab] = useState<typeof tabs[number]>("Profile");
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setUser(session.user);
+      }
+    };
+    fetchUser();
+  }, []);
   return (
     <AppShell>
       <div className="px-6 py-8 md:px-10">
@@ -32,7 +44,7 @@ function SettingsPage() {
           </nav>
 
           <div className="card-soft p-6 md:p-8">
-            {tab === "Profile" && <ProfileTab />}
+            {tab === "Profile" && <ProfileTab user={user} />}
             {tab === "Password" && <PasswordTab />}
             {tab === "Notifications" && <NotificationsTab />}
             {tab === "Danger Zone" && <DangerTab />}
@@ -43,25 +55,29 @@ function SettingsPage() {
   );
 }
 
-function ProfileTab() {
+function ProfileTab({ user }: { user: any }) {
+  const fullName = user?.user_metadata?.full_name || "User";
+  const initials = fullName.split(" ").map((n: string) => n[0]).join("").toUpperCase().substring(0, 2);
+  const email = user?.email || "";
+
   return (
     <div>
       <h2 className="text-xl font-extrabold">Profile</h2>
       <div className="mt-6 flex items-center gap-5">
         <div className="relative">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-xl font-extrabold text-primary-foreground">SJ</div>
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary text-xl font-extrabold text-primary-foreground">{initials}</div>
           <button className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full bg-surface text-primary shadow-soft ring-1 ring-border">
             <Camera className="h-3.5 w-3.5" />
           </button>
         </div>
         <div>
-          <p className="font-bold">Sarah Johnson</p>
+          <p className="font-bold">{fullName}</p>
           <p className="text-xs text-muted-foreground">JPG or PNG, max 2MB</p>
         </div>
       </div>
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <Field label="Full Name" value="Sarah Johnson" />
-        <Field label="Email" value="sarah@example.com" />
+        <Field label="Full Name" value={fullName} />
+        <Field label="Email" value={email} />
         <Field label="Phone Number" value="+1 (555) 123-4567" />
       </div>
       <button className="btn-primary mt-6">Save Changes</button>

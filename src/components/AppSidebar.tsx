@@ -1,7 +1,8 @@
-import { Link, useLocation } from "@tanstack/react-router";
-import { useState } from "react";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { LayoutDashboard, Github, BookOpen, Zap, LayoutTemplate, Sparkles, Settings, LogOut, Menu, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Logo } from "./Logo";
+import { supabase } from "@/lib/supabase";
 
 const items = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
@@ -18,6 +19,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { pathname } = useLocation();
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setUser(session.user);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.navigate({ to: "/signin" });
+  };
+
+  const fullName = user?.user_metadata?.full_name || "User";
+  const initials = fullName.split(" ").map((n: string) => n[0]).join("").toUpperCase().substring(0, 2);
 
   return (
     <div className="flex min-h-screen w-full bg-background">
@@ -71,11 +92,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <div className="border-t border-border p-3">
           <div className={`flex items-center gap-3 rounded-xl p-2 ${isCollapsed ? "justify-center" : ""}`}>
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-sm">SJ</div>
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-sm">{initials}</div>
             {!isCollapsed && (
               <div className="flex-1 min-w-0 transition-all duration-300">
-                <p className="truncate text-sm font-semibold">Sarah Johnson</p>
-                <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive">
+                <p className="truncate text-sm font-semibold">{fullName}</p>
+                <button onClick={handleSignOut} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive">
                   <LogOut className="h-3 w-3" /> Sign out
                 </button>
               </div>
