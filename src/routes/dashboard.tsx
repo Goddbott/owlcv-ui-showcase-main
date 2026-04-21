@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus, Edit, Eye, Share2, Trash2, Upload, FileText, Eye as EyeIcon, Download, Sparkles, Github } from "lucide-react";
+import { Plus, Edit, Eye, Share2, Trash2, Upload, FileText, Eye as EyeIcon, Download, Sparkles, Github, BookOpen, Zap } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
 
@@ -86,6 +86,26 @@ function Dashboard() {
             <p className="font-extrabold text-lg">AI Project Import</p>
             <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">Paste a GitHub URL and let AI generate your resume entry automatically.</p>
             <div className="mt-4 pill-green py-1.5 px-4 bg-emerald-100 text-emerald-700">New Feature</div>
+          </Link>
+
+          {/* Library */}
+          <Link to="/library" className="card-soft flex min-h-[380px] flex-col items-center justify-center gap-3 border-2 border-indigo-500/30 bg-indigo-500/5 p-8 text-center transition-all hover:bg-indigo-500/10 hover:border-indigo-500/50">
+            <div className="mx-auto mb-2 flex h-20 w-20 items-center justify-center rounded-2xl bg-indigo-500 text-white shadow-glow">
+               <BookOpen className="h-10 w-10" />
+            </div>
+            <p className="font-extrabold text-lg">Project Library</p>
+            <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">Manage your imported GitHub projects and custom assets in one place.</p>
+            <div className="mt-4 pill-green py-1.5 px-4 bg-indigo-100 text-indigo-700">Manage Assets</div>
+          </Link>
+
+          {/* Optimizer */}
+          <Link to="/optimizer" className="card-soft flex min-h-[380px] flex-col items-center justify-center gap-3 border-2 border-amber-500/30 bg-amber-500/5 p-8 text-center transition-all hover:bg-amber-500/10 hover:border-amber-500/50">
+            <div className="mx-auto mb-2 flex h-20 w-20 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-glow">
+               <Zap className="h-10 w-10" />
+            </div>
+            <p className="font-extrabold text-lg">ATS Optimizer</p>
+            <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">Get an instant match score for your resume against any job description.</p>
+            <div className="mt-4 pill-green py-1.5 px-4 bg-amber-100 text-amber-700">Check Score</div>
           </Link>
 
           {/* Upload */}

@@ -1,13 +1,15 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useState } from "react";
-import { LayoutDashboard, FileText, LayoutTemplate, Upload, Settings, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Github, BookOpen, Zap, LayoutTemplate, Sparkles, Settings, LogOut, Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 
 const items = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
-  { label: "My Resumes", to: "/dashboard", icon: FileText },
+  { label: "GitHub Import", to: "/import-project", icon: Github },
+  { label: "My Library", to: "/library", icon: BookOpen },
+  { label: "ATS Optimizer", to: "/optimizer", icon: Zap },
+  { label: "Resources", to: "/resources", icon: Sparkles },
   { label: "Templates", to: "/templates", icon: LayoutTemplate },
-  { label: "Upload Resume", to: "/upload", icon: Upload },
   { label: "Settings", to: "/settings", icon: Settings },
 ] as const;
 

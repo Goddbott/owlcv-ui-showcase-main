@@ -14,6 +14,9 @@ import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as OptimizerRouteImport } from './routes/optimizer'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as ImportProjectRouteImport } from './routes/import-project'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
@@ -43,6 +46,21 @@ const SigninRoute = SigninRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OptimizerRoute = OptimizerRouteImport.update({
+  id: '/optimizer',
+  path: '/optimizer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ImportProjectRoute = ImportProjectRouteImport.update({
@@ -75,6 +93,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
+  '/library': typeof LibraryRoute
+  '/optimizer': typeof OptimizerRoute
+  '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -87,6 +108,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
+  '/library': typeof LibraryRoute
+  '/optimizer': typeof OptimizerRoute
+  '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -100,6 +124,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
+  '/library': typeof LibraryRoute
+  '/optimizer': typeof OptimizerRoute
+  '/resources': typeof ResourcesRoute
   '/settings': typeof SettingsRoute
   '/signin': typeof SigninRoute
   '/signup': typeof SignupRoute
@@ -114,6 +141,9 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/import-project'
+    | '/library'
+    | '/optimizer'
+    | '/resources'
     | '/settings'
     | '/signin'
     | '/signup'
@@ -126,6 +156,9 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/import-project'
+    | '/library'
+    | '/optimizer'
+    | '/resources'
     | '/settings'
     | '/signin'
     | '/signup'
@@ -138,6 +171,9 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/import-project'
+    | '/library'
+    | '/optimizer'
+    | '/resources'
     | '/settings'
     | '/signin'
     | '/signup'
@@ -151,6 +187,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   ImportProjectRoute: typeof ImportProjectRoute
+  LibraryRoute: typeof LibraryRoute
+  OptimizerRoute: typeof OptimizerRoute
+  ResourcesRoute: typeof ResourcesRoute
   SettingsRoute: typeof SettingsRoute
   SigninRoute: typeof SigninRoute
   SignupRoute: typeof SignupRoute
@@ -197,6 +236,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/optimizer': {
+      id: '/optimizer'
+      path: '/optimizer'
+      fullPath: '/optimizer'
+      preLoaderRoute: typeof OptimizerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/import-project': {
       id: '/import-project'
       path: '/import-project'
@@ -239,6 +299,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   ImportProjectRoute: ImportProjectRoute,
+  LibraryRoute: LibraryRoute,
+  OptimizerRoute: OptimizerRoute,
+  ResourcesRoute: ResourcesRoute,
   SettingsRoute: SettingsRoute,
   SigninRoute: SigninRoute,
   SignupRoute: SignupRoute,

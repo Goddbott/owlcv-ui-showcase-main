@@ -4,9 +4,11 @@ import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 
 const links = [
-  { label: "Features", to: "/" },
-  { label: "Templates", to: "/templates" },
+  { label: "Dashboard", to: "/dashboard" },
   { label: "GitHub Import", to: "/import-project" },
+  { label: "My Library", to: "/library" },
+  { label: "ATS Optimizer", to: "/optimizer" },
+  { label: "Resources", to: "/resources" },
 ] as const;
 
 export function Navbar() {
