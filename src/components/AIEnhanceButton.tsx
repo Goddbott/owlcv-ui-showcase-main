@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Sparkles, Loader2, Check, X, ArrowRight } from "lucide-react";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface AIEnhanceButtonProps {
   currentText: string;
@@ -11,25 +12,45 @@ export function AIEnhanceButton({ currentText, onAccept, type = "experience" }: 
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [suggestedText, setSuggestedText] = useState<string | null>(null);
 
-  const handleEnhance = async () => {
+  const handleEnhance = async (e: React.MouseEvent) => {
+    e.preventDefault();
     if (!currentText.trim() || isEnhancing) return;
 
     setIsEnhancing(true);
-    // Simulated AI Delay
-    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    // Mock AI Improvements
-    let improved = "";
-    if (type === "experience") {
-      improved = `Spearheaded efforts to ${currentText.charAt(0).toLowerCase()}${currentText.slice(1)} This resulted in a significant improvement in efficiency and user satisfaction across the organization.`;
-    } else if (type === "summary") {
-      improved = `Results-oriented professional with extensive experience in ${currentText}. Proven track record of delivering high-impact solutions and driving business growth.`;
-    } else {
-      improved = `Strategically developed ${currentText}, utilizing modern methodologies to ensure scalability and high performance.`;
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("API Key missing");
+      }
+
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemma-3-27b-it" });
+
+      const prompt = `You are an expert ATS resume writer. Rewrite the following ${type} description to be a single, professional, impactful, and ATS-friendly line for a resume. Do not include any quotes, explanations, or extra formatting. Just the improved line.\n\nOriginal text: "${currentText}"`;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text().trim();
+      
+      setSuggestedText(text.replace(/^["']|["']$/g, ''));
+    } catch (error) {
+      console.warn("Falling back to local simulation due to error:", error);
+      
+      // Fallback Mock AI Improvements
+      let improved = "";
+      if (type === "experience") {
+        improved = `Spearheaded efforts to ${currentText.charAt(0).toLowerCase()}${currentText.slice(1)} This resulted in a significant improvement in efficiency and user satisfaction across the organization.`;
+      } else if (type === "summary") {
+        improved = `Results-oriented professional with extensive experience in ${currentText}. Proven track record of delivering high-impact solutions and driving business growth.`;
+      } else {
+        improved = `Strategically developed ${currentText}, utilizing modern methodologies to ensure scalability and high performance.`;
+      }
+  
+      setSuggestedText(improved);
+    } finally {
+      setIsEnhancing(false);
     }
-
-    setSuggestedText(improved);
-    setIsEnhancing(false);
   };
 
   if (suggestedText) {
@@ -41,14 +62,22 @@ export function AIEnhanceButton({ currentText, onAccept, type = "experience" }: 
         <p className="text-xs italic leading-relaxed text-foreground/80">{suggestedText}</p>
         <div className="mt-3 flex justify-end gap-2">
           <button
-            onClick={() => setSuggestedText(null)}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              setSuggestedText(null);
+            }}
             className="flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-bold text-muted-foreground hover:bg-muted transition-colors"
           >
             <X className="h-3 w-3" /> Reject
           </button>
           <button
-            onClick={() => {
-              onAccept(suggestedText);
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              if (!suggestedText.includes("API Key missing") && !suggestedText.includes("Failed to generate")) {
+                onAccept(suggestedText);
+              }
               setSuggestedText(null);
             }}
             className="flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-[10px] font-bold text-white shadow-glow hover:brightness-105 transition-all"
@@ -62,6 +91,7 @@ export function AIEnhanceButton({ currentText, onAccept, type = "experience" }: 
 
   return (
     <button
+      type="button"
       onClick={handleEnhance}
       disabled={isEnhancing || !currentText.trim()}
       className="btn-primary mt-2 px-3 py-1.5 text-[10px] h-8 disabled:opacity-50 disabled:grayscale transition-all"
