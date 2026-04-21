@@ -7,8 +7,9 @@ const items = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "GitHub Import", to: "/import-project", icon: Github },
   { label: "My Library", to: "/library", icon: BookOpen },
-  { label: "ATS Optimizer", to: "/optimizer", icon: Zap },
-  { label: "Resources", to: "/resources", icon: Sparkles },
+  { label: "ATS Calculator", to: "/calculator", icon: Zap },
+  { label: "ATS Optimizer", to: "/optimizer", icon: Sparkles },
+  { label: "Resources", to: "/resources", icon: LayoutTemplate },
   { label: "Templates", to: "/templates", icon: LayoutTemplate },
   { label: "Settings", to: "/settings", icon: Settings },
 ] as const;

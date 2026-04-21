@@ -5,8 +5,7 @@ import { Logo } from "./Logo";
 
 const links = [
   { label: "Dashboard", to: "/dashboard" },
-  { label: "GitHub Import", to: "/import-project" },
-  { label: "My Library", to: "/library" },
+  { label: "Calculator", to: "/calculator" },
   { label: "ATS Optimizer", to: "/optimizer" },
   { label: "Resources", to: "/resources" },
 ] as const;

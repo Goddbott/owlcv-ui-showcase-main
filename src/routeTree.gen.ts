@@ -19,6 +19,7 @@ import { Route as OptimizerRouteImport } from './routes/optimizer'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as ImportProjectRouteImport } from './routes/import-project'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RUsernameRouteImport } from './routes/r.$username'
 import { Route as EditorIdRouteImport } from './routes/editor.$id'
@@ -73,6 +74,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CalculatorRoute = CalculatorRouteImport.update({
+  id: '/calculator',
+  path: '/calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -91,6 +97,7 @@ const EditorIdRoute = EditorIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calculator': typeof CalculatorRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
   '/library': typeof LibraryRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calculator': typeof CalculatorRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
   '/library': typeof LibraryRoute
@@ -122,6 +130,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/calculator': typeof CalculatorRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
   '/library': typeof LibraryRoute
@@ -139,6 +148,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/calculator'
     | '/dashboard'
     | '/import-project'
     | '/library'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/calculator'
     | '/dashboard'
     | '/import-project'
     | '/library'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/calculator'
     | '/dashboard'
     | '/import-project'
     | '/library'
@@ -185,6 +197,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CalculatorRoute: typeof CalculatorRoute
   DashboardRoute: typeof DashboardRoute
   ImportProjectRoute: typeof ImportProjectRoute
   LibraryRoute: typeof LibraryRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/calculator': {
+      id: '/calculator'
+      path: '/calculator'
+      fullPath: '/calculator'
+      preLoaderRoute: typeof CalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -297,6 +317,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CalculatorRoute: CalculatorRoute,
   DashboardRoute: DashboardRoute,
   ImportProjectRoute: ImportProjectRoute,
   LibraryRoute: LibraryRoute,
