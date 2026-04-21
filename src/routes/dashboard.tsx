@@ -1,0 +1,109 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Plus, Edit, Eye, Share2, Trash2, Upload, FileText, Eye as EyeIcon, Download, Sparkles } from "lucide-react";
+import { AppShell } from "@/components/AppSidebar";
+import { ResumeThumb } from "@/components/ResumeThumb";
+
+export const Route = createFileRoute("/dashboard")({
+  head: () => ({ meta: [{ title: "Dashboard — OwlCV" }, { name: "description", content: "Manage your resumes and track activity." }] }),
+  component: Dashboard,
+});
+
+const resumes = [
+  { id: "1", title: "Software Engineer Resume", edited: "2 days ago", template: "Modern", accent: "emerald" as const },
+  { id: "2", title: "Product Designer CV", edited: "1 week ago", template: "Creative", accent: "amber" as const },
+  { id: "3", title: "Marketing Lead Resume", edited: "3 weeks ago", template: "Classic", accent: "slate" as const },
+];
+
+function Dashboard() {
+  return (
+    <AppShell>
+      <div className="px-6 py-6 md:px-10 md:py-10">
+        {/* Top bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold">Good morning, Sarah 👋</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Here's what's happening with your resumes today.</p>
+          </div>
+          <Link to="/editor/$id" params={{ id: "new" }} className="btn-primary"><Plus className="h-4 w-4" /> Create New Resume</Link>
+        </div>
+
+        {/* Stats */}
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat icon={<FileText className="h-4 w-4" />} label="Total Resumes" value="3" />
+          <Stat icon={<EyeIcon className="h-4 w-4" />} label="Profile Views" value="128" trend="+12%" />
+          <Stat icon={<Download className="h-4 w-4" />} label="Downloads" value="24" trend="+4" />
+          <div className="card-soft p-5">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" /> Profile Strength</span>
+              <span className="pill-green">Great</span>
+            </div>
+            <p className="mt-3 text-3xl font-extrabold">80%</p>
+            <div className="mt-3 h-2 rounded-full bg-muted">
+              <div className="h-full w-[80%] rounded-full bg-primary" />
+            </div>
+          </div>
+        </div>
+
+        {/* My Resumes */}
+        <div className="mt-12 flex items-center justify-between">
+          <h2 className="text-xl font-extrabold">My Resumes</h2>
+          <Link to="/templates" className="text-sm font-semibold text-primary hover:underline">Browse templates →</Link>
+        </div>
+
+        <div className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {resumes.map((r) => (
+            <div key={r.id} className="card-soft group overflow-hidden p-4 transition-transform hover:-translate-y-1">
+              <ResumeThumb accent={r.accent} className="!aspect-[4/5]" />
+              <div className="mt-4 flex items-start justify-between">
+                <div>
+                  <p className="font-bold">{r.title}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Last edited {r.edited}</p>
+                </div>
+                <span className="pill-green">{r.template}</span>
+              </div>
+              <div className="mt-4 grid grid-cols-4 gap-2">
+                <Link to="/editor/$id" params={{ id: r.id }} className="flex items-center justify-center rounded-lg bg-muted py-2 text-foreground hover:bg-primary-soft hover:text-primary" title="Edit"><Edit className="h-4 w-4" /></Link>
+                <Link to="/r/$username" params={{ username: "sarah-johnson" }} className="flex items-center justify-center rounded-lg bg-muted py-2 hover:bg-primary-soft hover:text-primary" title="Preview"><Eye className="h-4 w-4" /></Link>
+                <button className="flex items-center justify-center rounded-lg bg-muted py-2 hover:bg-primary-soft hover:text-primary" title="Share"><Share2 className="h-4 w-4" /></button>
+                <button className="flex items-center justify-center rounded-lg bg-muted py-2 hover:bg-red-50 hover:text-destructive" title="Delete"><Trash2 className="h-4 w-4" /></button>
+              </div>
+            </div>
+          ))}
+
+          {/* Create new card */}
+          <Link to="/editor/$id" params={{ id: "new" }} className="card-soft flex min-h-[380px] flex-col items-center justify-center gap-3 border-2 border-dashed border-primary/40 bg-primary-soft/20 p-8 text-center transition-colors hover:bg-primary-soft/40">
+            <span className="text-5xl">🦉</span>
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-glow"><Plus className="h-5 w-5" /></div>
+            <p className="font-bold">Start from scratch</p>
+            <p className="text-xs text-muted-foreground">Pick a template and start fresh</p>
+          </Link>
+
+          {/* Upload */}
+          <Link to="/upload" className="card-soft flex min-h-[380px] flex-col items-center justify-center gap-3 p-8 text-center transition-colors hover:border-primary">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-soft text-amber"><Upload className="h-5 w-5" /></div>
+            <p className="font-bold">Upload & Optimize</p>
+            <p className="text-xs text-muted-foreground">Drop your existing PDF/DOCX and let AI improve it</p>
+            <button className="btn-primary mt-2"><Upload className="h-4 w-4" /> Upload Now</button>
+          </Link>
+        </div>
+
+        {/* Mobile FAB */}
+        <Link to="/editor/$id" params={{ id: "new" }} className="fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-glow md:hidden">
+          <Plus className="h-6 w-6" />
+        </Link>
+      </div>
+    </AppShell>
+  );
+}
+
+function Stat({ icon, label, value, trend }: { icon: React.ReactNode; label: string; value: string; trend?: string }) {
+  return (
+    <div className="card-soft p-5">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span className="flex items-center gap-2 text-primary">{icon} {label}</span>
+        {trend && <span className="pill-green">{trend}</span>}
+      </div>
+      <p className="mt-3 text-3xl font-extrabold">{value}</p>
+    </div>
+  );
+}
