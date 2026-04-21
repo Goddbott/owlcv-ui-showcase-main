@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Plus, Edit, Eye, Share2, Trash2, Upload, FileText, Eye as EyeIcon, Download, Sparkles } from "lucide-react";
+import { Plus, Edit, Eye, Share2, Trash2, Upload, FileText, Eye as EyeIcon, Download, Sparkles, Github } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
 
@@ -76,6 +76,16 @@ function Dashboard() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white shadow-glow"><Plus className="h-5 w-5" /></div>
             <p className="font-bold">Start from scratch</p>
             <p className="text-xs text-muted-foreground">Pick a template and start fresh</p>
+          </Link>
+
+          {/* GitHub Import */}
+          <Link to="/import-project" className="card-soft flex min-h-[380px] flex-col items-center justify-center gap-3 border-2 border-emerald-500/30 bg-emerald-500/5 p-8 text-center transition-all hover:bg-emerald-500/10 hover:border-emerald-500/50">
+            <div className="mx-auto mb-2 flex h-20 w-20 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-glow animate-pulse">
+               <Github className="h-10 w-10" />
+            </div>
+            <p className="font-extrabold text-lg">AI Project Import</p>
+            <p className="text-xs text-muted-foreground max-w-[200px] mx-auto">Paste a GitHub URL and let AI generate your resume entry automatically.</p>
+            <div className="mt-4 pill-green py-1.5 px-4 bg-emerald-100 text-emerald-700">New Feature</div>
           </Link>
 
           {/* Upload */}

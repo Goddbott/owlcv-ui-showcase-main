@@ -6,8 +6,7 @@ import { Logo } from "./Logo";
 const links = [
   { label: "Features", to: "/" },
   { label: "Templates", to: "/templates" },
-  { label: "Pricing", to: "/" },
-  { label: "Docs", to: "/" },
+  { label: "GitHub Import", to: "/import-project" },
 ] as const;
 
 export function Navbar() {
