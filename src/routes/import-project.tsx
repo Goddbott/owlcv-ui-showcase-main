@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ArrowLeft, Github, Loader2, Sparkles, Check, AlertCircle, Plus, Terminal, FileText, Trash2, X } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { parseGitHubUrl, fetchRepoInfo, fetchReadme, fetchFileTree } from "@/lib/github-api";
-import { generateProjectEntry, AIGeneratedProject } from "@/lib/ai-mock";
+import { generateProjectEntry, type AIGeneratedProject } from "@/lib/gemini";
 
 export const Route = createFileRoute("/import-project")({
   component: ImportProject,
