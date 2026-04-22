@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Github, Save } from "lucide-react";
+import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Github, Save, BookOpen } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
 import { useResume, ResumeData, Experience, Project, Education } from "@/hooks/use-resume";
 import { GitHubImport } from "@/components/GitHubImport";
 import { AIEnhanceButton } from "@/components/AIEnhanceButton";
 import { CustomizationPanel } from "@/components/CustomizationPanel";
+import { ProjectLibraryModal } from "@/components/ProjectLibraryModal";
 import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/editor/$id")({
@@ -25,6 +26,7 @@ function Editor() {
   const [skillInput, setSkillInput] = useState("");
   const [title, setTitle] = useState("Software Engineer Resume");
   const [saving, setSaving] = useState(false);
+  const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
 
   useEffect(() => {
     async function loadResume() {
@@ -97,6 +99,25 @@ function Editor() {
     }
   };
 
+  const handleLibraryImport = (importedProject: any) => {
+    // Add the newly imported project
+    // Since useResume hook's addProject doesn't take args, we'll get the current projects length and update the last one, or we need to update the entire projects array.
+    // Let's use the setData approach since we have it.
+    const newProject = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: importedProject.name,
+      url: importedProject.url,
+      description: importedProject.description
+    };
+    
+    // If there's an empty default project, replace it
+    if (data.projects.length === 1 && data.projects[0].name === "") {
+      setData({ ...data, projects: [newProject] });
+    } else {
+      setData({ ...data, projects: [...data.projects, newProject] });
+    }
+  };
+
   return (
     <AppShell>
       <div className="grid min-h-[calc(100vh-3.5rem)] md:min-h-screen md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
@@ -150,7 +171,7 @@ function Editor() {
                 {activeSection === "Work Experience" && <WorkExperienceList experience={data.experience} updateExperience={updateExperience} addExperience={addExperience} removeExperience={removeExperience} />}
                 {activeSection === "Education" && <EducationSection education={data.education} updateEducation={(id, edu) => {}} />}
                 {activeSection === "Skills" && <SkillsSection skills={data.skills} updateSkills={updateSkills} skillInput={skillInput} setSkillInput={setSkillInput} addSkill={addSkill} />}
-                {activeSection === "Projects" && <ProjectsSection projects={data.projects} updateProject={updateProject} addProject={addProject} />}
+                {activeSection === "Projects" && <ProjectsSection projects={data.projects} updateProject={updateProject} addProject={addProject} openLibraryModal={() => setIsLibraryModalOpen(true)} />}
                 {activeSection === "Certifications" && <CertificationsSection />}
                 {activeSection === "Design" && <CustomizationPanel accentColor={data.accentColor} setAccent={setAccent} template={data.template} setTemplate={setTemplate} />}
               </div>
@@ -191,6 +212,12 @@ function Editor() {
           </div>
         </div>
       </div>
+
+      <ProjectLibraryModal 
+        isOpen={isLibraryModalOpen} 
+        onClose={() => setIsLibraryModalOpen(false)} 
+        onImport={handleLibraryImport} 
+      />
     </AppShell>
   );
 }
@@ -345,7 +372,7 @@ function SkillsSection({ skills, updateSkills, skillInput, setSkillInput, addSki
   );
 }
 
-function ProjectsSection({ projects, updateProject, addProject }: { projects: Project[]; updateProject: any; addProject: any }) {
+function ProjectsSection({ projects, updateProject, addProject, openLibraryModal }: { projects: Project[]; updateProject: any; addProject: any; openLibraryModal: () => void }) {
   return (
     <div className="space-y-6">
       {projects.map((proj) => (
@@ -366,7 +393,10 @@ function ProjectsSection({ projects, updateProject, addProject }: { projects: Pr
           </div>
         </div>
       ))}
-      <button onClick={addProject} className="btn-outline w-full py-4 border-dashed border-2"><Plus className="h-4 w-4" /> Add Project</button>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button onClick={addProject} className="btn-outline flex-1 py-4 border-dashed border-2 hover:bg-primary/5 transition-all"><Plus className="h-4 w-4" /> Add Project</button>
+        <button onClick={openLibraryModal} className="btn-primary flex-1 py-4 shadow-glow"><BookOpen className="h-4 w-4 mr-2 inline" /> Import from Library</button>
+      </div>
     </div>
   );
 }
@@ -537,9 +567,9 @@ function ResumePreview({ data }: { data: ResumeData }) {
                          <Job 
                           key={proj.id}
                           role={proj.name} 
-                          company={proj.url} 
+                          company={proj.url ? <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" style={{ color: accentStyles.color }} className="hover:underline hover:opacity-80 transition-opacity">View Project</a> : null} 
                           date="" 
-                          bullets={[proj.description]} 
+                          bullets={proj.description.split('.').filter(b => b.trim()).map(b => b.trim())} 
                         />
                     ))}
                 </Section>
@@ -575,11 +605,13 @@ function Section({ title, children, accentColor }: { title: string; children: Re
   );
 }
 
-function Job({ role, company, date, bullets }: { role: string; company: string; date: string; bullets: string[] }) {
+function Job({ role, company, date, bullets }: { role: string; company?: React.ReactNode; date: string; bullets: string[] }) {
   return (
     <div>
       <div className="flex items-baseline justify-between">
-        <p className="text-xs font-bold">{role} · <span className="font-semibold text-slate-600">{company}</span></p>
+        <p className="text-xs font-bold">
+          {role} {company && <>· <span className="font-semibold text-slate-600">{company}</span></>}
+        </p>
         <p className="text-[10px] text-slate-500 font-medium">{date}</p>
       </div>
       <ul className="mt-2 list-disc space-y-1 pl-4 text-[11px] leading-relaxed text-slate-600">

@@ -105,7 +105,7 @@ function Library() {
                       <Clock className="h-3 w-3" /> Imported {new Date(project.importedAt).toLocaleDateString()}
                    </div>
                    {project.repoUrl && (
-                      <a href={`https://${project.repoUrl}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline">
+                      <a href={project.repoUrl.startsWith('http') ? project.repoUrl : `https://${project.repoUrl}`} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-primary flex items-center gap-1 hover:underline">
                         Repo <ExternalLink className="h-2.5 w-2.5" />
                       </a>
                    )}
