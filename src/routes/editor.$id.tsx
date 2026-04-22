@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Save, BookOpen } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
@@ -54,6 +54,34 @@ function Editor() {
   const [title, setTitle] = useState("Software Engineer Resume");
   const [saving, setSaving] = useState(false);
   const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
+  const [splitPercent, setSplitPercent] = useState(38);
+  const isDragging = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!isDragging.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const pct = ((ev.clientX - rect.left) / rect.width) * 100;
+      setSplitPercent(Math.min(70, Math.max(20, pct)));
+    };
+
+    const onMouseUp = () => {
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }, []);
 
   useEffect(() => {
     async function loadResume() {
@@ -115,6 +143,54 @@ function Editor() {
     if (currentIndex > 0) setActiveSection(sections[currentIndex - 1]);
   };
 
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('resume-preview-root');
+    if (!element) return;
+    setDownloading(true);
+    try {
+      const mod = await import('html2pdf.js');
+      const html2pdf = mod.default || mod;
+      const opt = {
+        margin: 0,
+        filename: `${title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      };
+      await html2pdf().set(opt).from(element).save();
+    } catch (err) {
+      console.error('html2pdf failed, falling back to print:', err);
+      // Fallback: open print dialog so user can "Save as PDF"
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+          .map(s => s.outerHTML).join('\n');
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head><title>${title}</title>${styles}
+          <style>
+            @page { size: A4; margin: 0; }
+            body { margin: 0; padding: 0; background: white; }
+            .resume-preview-container { box-shadow: none !important; border: none !important; }
+          </style>
+          </head>
+          <body>${element.innerHTML}</body>
+          </html>
+        `);
+        printWindow.document.close();
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 500);
+      }
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const handleLibraryImport = (importedProject: any) => {
     const newProject = {
       id: Math.random().toString(36).substr(2, 9),
@@ -132,9 +208,9 @@ function Editor() {
 
   return (
     <AppShell>
-      <div className="grid min-h-[calc(100vh-3.5rem)] md:min-h-screen md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div ref={containerRef} className="flex min-h-[calc(100vh-3.5rem)] md:min-h-screen">
         {/* LEFT FORM PANEL */}
-        <div className="border-b border-border md:border-b-0 md:border-r md:overflow-y-auto md:h-screen bg-surface">
+        <div className="border-b border-border md:border-b-0 md:overflow-y-auto md:h-screen bg-surface" style={{ width: `${splitPercent}%`, minWidth: '280px' }}>
           <div className="px-6 py-6 pb-24">
             <Link to="/dashboard" className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">
               <ArrowLeft className="h-3 w-3" /> My Resumes
@@ -215,8 +291,16 @@ function Editor() {
           </div>
         </div>
 
+        {/* DRAGGABLE DIVIDER */}
+        <div
+          onMouseDown={handleMouseDown}
+          className="hidden md:flex w-2 cursor-col-resize items-center justify-center bg-border/50 hover:bg-primary/20 active:bg-primary/30 transition-colors group flex-shrink-0"
+        >
+          <div className="h-8 w-0.5 rounded-full bg-muted-foreground/30 group-hover:bg-primary group-active:bg-primary transition-colors" />
+        </div>
+
         {/* RIGHT PREVIEW PANEL */}
-        <div className="bg-surface-2/40 md:overflow-y-auto md:h-screen border-l border-border">
+        <div className="bg-surface-2/40 md:overflow-y-auto md:h-screen flex-1 min-w-[300px]">
           <div className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
             <div className="flex items-center justify-between px-6 py-3">
                 <div className="flex items-center gap-2">
@@ -225,7 +309,7 @@ function Editor() {
                 </div>
                 <div className="flex items-center gap-2">
                 <button className="btn-outline px-3 py-1.5 text-[11px]"><Share2 className="h-3.5 w-3.5" /> Share</button>
-                <button className="btn-primary px-3 py-1.5 text-[11px]"><Download className="h-3.5 w-3.5" /> Download PDF</button>
+                <button onClick={handleDownloadPDF} disabled={downloading} className="btn-primary px-3 py-1.5 text-[11px] disabled:opacity-70"><Download className="h-3.5 w-3.5" /> {downloading ? 'Generating...' : 'Download PDF'}</button>
                 </div>
             </div>
             
@@ -263,8 +347,10 @@ function Editor() {
             </div>
           </div>
 
-          <div className="p-6 md:p-10 scale-[0.85] xl:scale-100 origin-top flex justify-center">
-            <ResumePreview data={data} />
+          <div className="p-6 md:p-10 origin-top flex justify-center">
+            <div id="resume-preview-root">
+              <ResumePreview data={data} />
+            </div>
           </div>
           
           <div className="flex justify-center pb-10">
@@ -302,34 +388,7 @@ function Field({ label, value, onChange, type = "text", className = "", placehol
 function PersonalInfo({ personal, updatePersonal, accentColor }: { personal: ResumeData["personal"]; updatePersonal: any; accentColor: string }) {
   return (
     <div className="card-soft p-6 border-l-4 border-l-sky-500/30 space-y-6">
-      <div className="flex items-center gap-6">
-        <div className={`relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl border-2 ${personal.removeBackground ? 'border-primary shadow-glow' : 'border-dashed border-border'} bg-surface flex flex-col items-center justify-center transition-all`}>
-          {personal.photoUrl ? (
-             <div className="w-full h-full relative">
-                <img src={personal.photoUrl} alt="Profile" className={`h-full w-full object-cover transition-all ${personal.removeBackground ? 'grayscale-[0.5] mix-blend-multiply' : ''}`} />
-                {personal.removeBackground && (
-                    <div className={`absolute inset-0 -z-10 bg-${accentColor}-500/20`} style={{ backgroundColor: personal.removeBackground ? `var(--color-${accentColor}-soft)` : '' }} />
-                )}
-             </div>
-          ) : (
-            <>
-              <Camera className="h-5 w-5 text-muted-foreground" />
-              <p className="mt-1 text-[10px] font-bold text-muted-foreground">Upload Photo</p>
-            </>
-          )}
-        </div>
-        <div className="space-y-3">
-            <button className="btn-outline px-4 py-2 text-xs"><Camera className="h-3.5 w-3.5" /> Change Photo</button>
-            <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => updatePersonal({ removeBackground: !personal.removeBackground })}
-                  className={`btn-primary px-3 py-2 text-[11px] transition-all ${personal.removeBackground ? 'gradient-emerald' : 'bg-surface border border-border text-foreground hover:text-primary'}`}
-                >
-                  <Sparkles className="h-3 w-3 mr-1.5" /> {personal.removeBackground ? "Background Removed" : "Remove Background"}
-                </button>
-            </div>
-        </div>
-      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <Field label="Full Name" value={personal.fullName} onChange={(v) => updatePersonal({ fullName: v })} />
         <Field label="Email" value={personal.email} onChange={(v) => updatePersonal({ email: v })} />
@@ -559,18 +618,43 @@ function ResumePreview({ data }: { data: ResumeData }) {
     padding: 32,
   };
 
+  const fontStack = s.fontFamily === 'serif' ? 'ui-serif, Georgia, Cambria, "Times New Roman", Times, serif' : 
+                   s.fontFamily === 'mono' ? 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace' :
+                   s.fontFamily === 'system-ui' ? 'system-ui, -apple-system, sans-serif' :
+                   '"Inter", system-ui, -apple-system, sans-serif';
+
   const wrapperStyles = {
-    fontSize: `${s.fontSize}px`,
-    lineHeight: s.lineHeight,
-    letterSpacing: `${s.letterSpacing}px`,
+    width: '210mm',
+    minWidth: '210mm',
+    height: '297mm',
+    minHeight: '297mm',
     padding: `${s.padding}px`,
-    fontFamily: s.fontFamily,
   };
+
+  const globalStyles = `
+    .resume-preview-container {
+        font-family: ${fontStack} !important;
+        font-size: ${s.fontSize}px !important;
+        line-height: ${s.lineHeight} !important;
+        letter-spacing: ${s.letterSpacing}px !important;
+    }
+    .resume-preview-container h1 { font-size: 2.5em !important; }
+    .resume-preview-container h2 { font-size: 1.3em !important; }
+    .resume-preview-container h3 { font-size: 1.1em !important; }
+    .resume-preview-container p, 
+    .resume-preview-container span, 
+    .resume-preview-container li, 
+    .resume-preview-container a,
+    .resume-preview-container div:not(.resume-preview-container) { 
+        font-size: 1em !important; 
+    }
+  `;
 
   // Different template layouts
   if (template === "latex") {
     return (
-      <div className="mx-auto aspect-[1/1.414] max-w-[850px] overflow-hidden bg-white shadow-card" style={wrapperStyles}>
+      <div className="resume-preview-container mx-auto bg-white shadow-2xl" style={wrapperStyles}>
+        <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
         {/* HEADING */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-normal uppercase tracking-tight mb-2" style={{ fontVariant: 'small-caps' }}>{personal.fullName}</h1>
@@ -738,7 +822,8 @@ function ResumePreview({ data }: { data: ResumeData }) {
 
   if (template === "minimal") {
       return (
-        <div className="mx-auto aspect-[1/1.414] max-w-[850px] overflow-hidden rounded-xl bg-white text-slate-900 shadow-card ring-1 ring-border" style={wrapperStyles}>
+        <div className="resume-preview-container mx-auto bg-white text-slate-900 shadow-2xl border border-slate-100" style={wrapperStyles}>
+          <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
           <div className="text-center mb-10">
              <h1 className="text-4xl font-light tracking-tight">{personal.fullName}</h1>
              <div className="mt-4 flex items-center justify-center gap-3 text-[10px] text-slate-400">
@@ -858,7 +943,8 @@ function ResumePreview({ data }: { data: ResumeData }) {
   }
 
   return (
-    <div className="mx-auto aspect-[1/1.414] max-w-[850px] overflow-hidden rounded-xl bg-white text-slate-900 shadow-card ring-1 ring-border flex" style={wrapperStyles}>
+    <div className="resume-preview-container mx-auto bg-white text-slate-900 shadow-2xl border border-slate-100 flex" style={wrapperStyles}>
+      <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
       {/* Sidebar for classic template */}
       {template === "classic" && (
           <aside className="w-1/3 bg-slate-50 p-8 border-r border-slate-100">
