@@ -22,6 +22,7 @@ const templates = [
   { id: "modern", name: "Modern", description: "Clean & Professional" },
   { id: "classic", name: "Classic", description: "Traditional Layout" },
   { id: "minimal", name: "Minimal", description: "Less is More" },
+  { id: "latex", name: "Latex", description: "Jake's Template" },
 ];
 
 export function CustomizationPanel({ accentColor, setAccent, template, setTemplate }: CustomizationPanelProps) {
