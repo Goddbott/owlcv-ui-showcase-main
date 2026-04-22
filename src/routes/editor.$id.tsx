@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Github, Save, BookOpen } from "lucide-react";
+import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Save, BookOpen } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
 import { useResume, ResumeData, Experience, Project, Education } from "@/hooks/use-resume";
-import { GitHubImport } from "@/components/GitHubImport";
+
 import { AIEnhanceButton } from "@/components/AIEnhanceButton";
 import { CustomizationPanel } from "@/components/CustomizationPanel";
 import { ProjectLibraryModal } from "@/components/ProjectLibraryModal";
@@ -86,18 +86,6 @@ function Editor() {
     }
   };
 
-  const handleGitHubImport = (imported: any) => {
-    updatePersonal(imported.personal);
-    updateSkills(imported.skills);
-    // Add projects if none exist
-    if (data.projects.length <= 1 && data.projects[0].name === "") {
-        imported.projects.forEach((p: any) => {
-            // This is a bit hacky since I don't have a bulk add, but I'll update the first one or add new ones
-            addProject();
-            // ... update logic here
-        });
-    }
-  };
 
   const handleLibraryImport = (importedProject: any) => {
     // Add the newly imported project
@@ -164,7 +152,6 @@ function Editor() {
               <div className="animate-in fade-in slide-in-from-right-4 duration-500 ease-out">
                 {activeSection === "Personal Info" && (
                     <div className="space-y-6">
-                      <GitHubImport onImport={handleGitHubImport} />
                       <PersonalInfo personal={data.personal} updatePersonal={updatePersonal} accentColor={data.accentColor} />
                     </div>
                 )}
