@@ -11,6 +11,15 @@ export type Experience = {
   isCurrent: boolean;
 };
 
+export type Por = {
+  id: string;
+  role: string;
+  event: string;
+  duration: string;
+  description: string;
+};
+
+
 export type Education = {
   id: string;
   degree: string;
@@ -55,14 +64,20 @@ export type ResumeData = {
   personal: {
     fullName: string;
     email: string;
+    email2?: string;
     phone: string;
     location: string;
     linkedin: string;
+    github?: string;
     portfolio: string;
     photoUrl?: string;
+    collegeLogo?: string;
+    rollNo?: string;
+    course?: string;
     removeBackground: boolean;
   };
   experience: Experience[];
+  por: Por[];
   education: Education[];
   skills: SkillCategory[];
   projects: Project[];
@@ -70,7 +85,7 @@ export type ResumeData = {
   achievements: string[];
   codingProfiles: CodingProfile[];
   accentColor: string;
-  template: "modern" | "classic" | "minimal" | "latex";
+  template: "modern" | "classic" | "minimal" | "latex" | "iiita";
   settings: {
     fontSize: number;
     lineHeight: number;
@@ -84,10 +99,15 @@ const initialData: ResumeData = {
   personal: {
     fullName: "Sarah Johnson",
     email: "sarah@example.com",
+    email2: "",
     phone: "+1 (555) 123-4567",
     location: "San Francisco, CA",
     linkedin: "linkedin.com/in/sarah",
+    github: "",
     portfolio: "sarahjohnson.design",
+    collegeLogo: "",
+    rollNo: "",
+    course: "",
     removeBackground: false,
   },
   experience: [
@@ -102,6 +122,7 @@ const initialData: ResumeData = {
       isCurrent: true,
     },
   ],
+  por: [],
   education: [
     {
       id: "1",
@@ -188,6 +209,28 @@ export function useResume() {
 
   const removeExperience = useCallback((id: string) => {
     setData((prev) => ({ ...prev, experience: prev.experience.filter((e) => e.id !== id) }));
+  }, []);
+
+  const addPor = useCallback(() => {
+    const newPor: Por = {
+      id: Math.random().toString(36).substr(2, 9),
+      role: "",
+      event: "",
+      duration: "",
+      description: "",
+    };
+    setData((prev) => ({ ...prev, por: [...prev.por, newPor] }));
+  }, []);
+
+  const updatePor = useCallback((id: string, porData: Partial<Por>) => {
+    setData((prev) => ({
+      ...prev,
+      por: prev.por.map((p) => (p.id === id ? { ...p, ...porData } : p)),
+    }));
+  }, []);
+
+  const removePor = useCallback((id: string) => {
+    setData((prev) => ({ ...prev, por: prev.por.filter((p) => p.id !== id) }));
   }, []);
 
   const addEducation = useCallback(() => {
@@ -340,6 +383,9 @@ export function useResume() {
     addExperience,
     updateExperience,
     removeExperience,
+    addPor,
+    updatePor,
+    removePor,
     addEducation,
     updateEducation,
     removeEducation,

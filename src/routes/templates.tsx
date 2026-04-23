@@ -12,15 +12,8 @@ export const Route = createFileRoute("/templates")({
 const filters = ["All", "Modern", "Classic", "Creative", "Minimal"] as const;
 
 const templates = [
-  { name: "Modern Green", category: "Modern", accent: "emerald" as const },
-  { name: "Classic Clean", category: "Classic", accent: "slate" as const },
-  { name: "Creative Dark", category: "Creative", accent: "amber" as const },
-  { name: "Minimal White", category: "Minimal", accent: "teal" as const },
-  { name: "Bold Blue", category: "Modern", accent: "blue" as const },
-  { name: "Professional Gray", category: "Classic", accent: "slate" as const },
-  { name: "Lime Spark", category: "Creative", accent: "lime" as const },
-  { name: "Editorial Amber", category: "Creative", accent: "amber" as const },
-  { name: "Quiet Minimal", category: "Minimal", accent: "teal" as const },
+  { name: "Jake's Template", category: "Classic", template: "latex", accent: "slate" as const },
+  { name: "IIITA Template", category: "College", template: "iiita", accent: "emerald" as const },
 ];
 
 function Templates() {
