@@ -45,6 +45,7 @@ export function ProjectLibraryModal({ isOpen, onClose, onImport }: ProjectLibrar
         name: selectedProject.title,
         url: selectedProject.repoUrl ? (selectedProject.repoUrl.startsWith('http') ? selectedProject.repoUrl : `https://${selectedProject.repoUrl}`) : "",
         description: bullets.join(". "), // The resume preview expects a string separated by newlines or periods depending on the parser. 
+        techStack: selectedProject.techStack ? selectedProject.techStack.join(", ") : "",
         // Wait, the Resume Preview `Job` component splits by '.' but the editor has a textarea that takes a single string.
         // Actually, we should just join them with newlines or periods so the user can edit them in the textarea.
         // The Job component splits by '.' and trims. So let's join with '.' and space.
