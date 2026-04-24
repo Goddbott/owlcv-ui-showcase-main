@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppSidebar";
+import { useAuth } from "@/hooks/use-auth";
 import { BookOpen, Search, ArrowRight, Star, ExternalLink, Sparkles, Files, Terminal } from "lucide-react";
 
 export const Route = createFileRoute("/resources")({
@@ -52,6 +53,7 @@ const articles = [
 ];
 
 function Resources() {
+  const { session } = useAuth();
   return (
     <AppShell>
       <div className="mx-auto max-w-6xl px-6 py-6 md:px-10 md:py-10">
@@ -105,7 +107,11 @@ function Resources() {
                    Join 50,000+ professionals who use OwlCV to create resumes that actually get results.
                 </p>
                 <div className="mt-8 flex gap-4">
-                    <button className="btn-primary bg-white text-primary hover:bg-white/90">Sign Up Free</button>
+                    {!session ? (
+                        <Link to="/signup" className="btn-primary bg-white text-primary hover:bg-white/90">Sign Up Free</Link>
+                    ) : (
+                        <Link to="/dashboard" className="btn-primary bg-white text-primary hover:bg-white/90">Go to Dashboard</Link>
+                    )}
                     <button className="btn-outline border-white/30 bg-transparent text-white hover:border-white">Explore Templates</button>
                 </div>
             </div>

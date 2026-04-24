@@ -153,3 +153,56 @@ Respond ONLY with a raw JSON object (no markdown, no backticks) in the following
     };
   }
 }
+
+export async function analyzeResumeAgainstJobDescription(
+  resumeText: string,
+  jobDescription: string
+): Promise<AIKeywordResult> {
+  const prompt = `
+You are an expert ATS (Applicant Tracking System) and Career Coach.
+I am providing you with a candidate's resume and a target job description.
+Your task is to analyze the resume against the job description and tell the user what skills they have, what skills they are missing, and provide an optimization score.
+
+Resume Text:
+${resumeText.substring(0, 5000)}
+
+Job Description:
+${jobDescription.substring(0, 5000)}
+
+Perform a keyword and semantic analysis:
+1. Identify technical skills, tools, and soft skills required in the job description that are PRESENT in the resume. Group them by category.
+2. Identify required skills from the job description that are MISSING in the resume.
+3. Calculate a match score from 0 to 100 based on how well the resume fits the job description.
+4. Provide actionable suggestions on what skills the user should learn or add to their resume to improve their score.
+
+Respond ONLY with a raw JSON object (no markdown, no backticks) in the following format:
+{
+  "score": 85,
+  "matchedKeywords": [
+    { "category": "Programming Languages", "keywords": ["JavaScript", "TypeScript"] }
+  ],
+  "missingKeywords": [
+    { "category": "Testing", "keywords": ["Jest", "Cypress"] }
+  ],
+  "suggestions": [
+    "Learn Jest and Cypress as they are required for the role."
+  ]
+}
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    return JSON.parse(cleanedText) as AIKeywordResult;
+  } catch (error) {
+    console.error("Error analyzing resume against job description:", error);
+    return {
+      score: 0,
+      matchedKeywords: [],
+      missingKeywords: [],
+      suggestions: ["AI evaluation failed. Could not analyze resume against job description."]
+    };
+  }
+}

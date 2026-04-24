@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Check } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({ meta: [{ title: "Resume Templates — OwlCV" }, { name: "description", content: "Choose from beautiful, ATS-friendly resume templates." }] }),
@@ -17,6 +18,7 @@ const templates = [
 ];
 
 function Templates() {
+  const { session } = useAuth();
   const [active, setActive] = useState<typeof filters[number]>("All");
   const visible = templates.filter((t) => active === "All" || t.category === active);
 
@@ -72,7 +74,11 @@ function Templates() {
         <div className="mt-16 rounded-3xl bg-primary-soft/60 p-10 text-center">
           <h3 className="text-xl font-extrabold">Not sure which one to pick?</h3>
           <p className="mt-2 text-sm text-muted-foreground">All templates are free to try — switch anytime in the editor.</p>
-          <Link to="/signup" className="btn-primary mt-5">Get Started</Link>
+          {!session ? (
+            <Link to="/signup" className="btn-primary mt-5">Get Started</Link>
+          ) : (
+            <Link to="/dashboard" className="btn-primary mt-5">Go to Dashboard</Link>
+          )}
         </div>
       </div>
     </AppShell>

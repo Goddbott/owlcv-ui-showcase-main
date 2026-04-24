@@ -776,20 +776,45 @@ function ResumePreview({ data }: { data: ResumeData }) {
         {/* HEADING */}
         <div className="text-center mb-6">
           <h1 className="text-3xl font-normal uppercase tracking-tight mb-2" style={{ fontVariant: 'small-caps' }}>{personal.fullName}</h1>
-          <div className="text-[11px] flex items-center justify-center gap-2">
+          {(personal.course || personal.rollNo) && (
+             <div className="text-[12px] mb-2 font-medium">
+                {personal.course && <span>{personal.course}</span>}
+                {personal.course && personal.rollNo && <span> · </span>}
+                {personal.rollNo && <span>Roll No: {personal.rollNo}</span>}
+             </div>
+          )}
+          <div className="text-[11px] flex flex-wrap items-center justify-center gap-2">
+            {personal.location && (
+                <>
+                    <span>{personal.location}</span>
+                    <span>|</span>
+                </>
+            )}
             <span>{personal.phone}</span>
             <span>|</span>
             <a href={`mailto:${personal.email}`} className="border-b border-transparent hover:border-slate-900 transition-colors">{personal.email}</a>
+            {personal.email2 && (
+                <>
+                    <span>|</span>
+                    <a href={`mailto:${personal.email2}`} className="border-b border-transparent hover:border-slate-900 transition-colors">{personal.email2}</a>
+                </>
+            )}
             {personal.linkedin && (
                 <>
                     <span>|</span>
-                    <a href={personal.linkedin} className="border-b border-transparent hover:border-slate-900 transition-colors">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a>
+                    <a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="border-b border-transparent hover:border-slate-900 transition-colors">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a>
+                </>
+            )}
+            {personal.github && (
+                <>
+                    <span>|</span>
+                    <a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`} className="border-b border-transparent hover:border-slate-900 transition-colors">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</a>
                 </>
             )}
             {personal.portfolio && (
                 <>
                     <span>|</span>
-                    <a href={personal.portfolio} className="border-b border-transparent hover:border-slate-900 transition-colors">{personal.portfolio.replace(/^https?:\/\/(www\.)?/, '')}</a>
+                    <a href={personal.portfolio.startsWith('http') ? personal.portfolio : `https://${personal.portfolio}`} className="border-b border-transparent hover:border-slate-900 transition-colors">{personal.portfolio.replace(/^https?:\/\/(www\.)?/, '')}</a>
                 </>
             )}
           </div>
@@ -991,8 +1016,10 @@ function ResumePreview({ data }: { data: ResumeData }) {
               {personal.phone && <span>+91-{personal.phone.replace('+91-', '')}</span>}
               {personal.email && <a href={`mailto:${personal.email}`}>{personal.email}</a>}
               {personal.email2 && <a href={`mailto:${personal.email2}`}>{personal.email2}</a>}
-              {personal.github && <a href={personal.github}>{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</a>}
-              {personal.linkedin && <a href={personal.linkedin}>{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a>}
+              {personal.github && <a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`}>{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</a>}
+              {personal.linkedin && <a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`}>{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a>}
+              {personal.portfolio && <a href={personal.portfolio.startsWith('http') ? personal.portfolio : `https://${personal.portfolio}`}>{personal.portfolio.replace(/^https?:\/\/(www\.)?/, '')}</a>}
+              {personal.location && <span>{personal.location}</span>}
             </div>
           </div>
         </div>
@@ -1009,10 +1036,11 @@ function ResumePreview({ data }: { data: ResumeData }) {
                       <span className="font-bold">{edu.institution}</span>
                       <span>{edu.grade && `CGPA/Percentage: ${edu.grade}`}</span>
                     </div>
-                    <div className="flex justify-between items-baseline italic">
+                    <div className="flex justify-between items-baseline italic mb-0.5">
                       <span>{edu.degree}{edu.field ? `, ${edu.field}` : ""}</span>
                       <span>{edu.startYear} — {edu.endYear}</span>
                     </div>
+                    {edu.location && <div className="text-[10px] italic text-slate-600">{edu.location}</div>}
                   </div>
                 ))}
               </div>
@@ -1169,12 +1197,19 @@ function ResumePreview({ data }: { data: ResumeData }) {
           <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
           <div className="text-center mb-10">
              <h1 className="text-4xl font-light tracking-tight">{personal.fullName}</h1>
-             <div className="mt-4 flex items-center justify-center gap-3 text-[10px] text-slate-400">
-                <span>{personal.email}</span>
-                <span>•</span>
-                <span>{personal.location}</span>
-                <span>•</span>
-                <span>{personal.phone}</span>
+             {(personal.course || personal.rollNo) && (
+                <div className="mt-2 text-xs text-slate-500 font-medium tracking-wide">
+                   {personal.course} {personal.course && personal.rollNo && '·'} {personal.rollNo && `Roll No: ${personal.rollNo}`}
+                </div>
+             )}
+             <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-[10px] text-slate-400">
+                {personal.email && <span>{personal.email}</span>}
+                {personal.email2 && <><span>•</span><span>{personal.email2}</span></>}
+                {personal.location && <><span>•</span><span>{personal.location}</span></>}
+                {personal.phone && <><span>•</span><span>{personal.phone}</span></>}
+                {personal.linkedin && <><span>•</span><a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="hover:underline">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
+                {personal.github && <><span>•</span><a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`} className="hover:underline">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
+                {personal.portfolio && <><span>•</span><a href={personal.portfolio.startsWith('http') ? personal.portfolio : `https://${personal.portfolio}`} className="hover:underline">{personal.portfolio.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
              </div>
           </div>
           
@@ -1297,16 +1332,27 @@ function ResumePreview({ data }: { data: ResumeData }) {
                         <img src={personal.photoUrl || personal.collegeLogo} alt="Avatar" className="h-full w-full object-cover" />
                     </div>
                 )}
-                <h1 className="text-xl font-bold text-left leading-tight">{personal.fullName}</h1>
+                <div className="flex-1">
+                   <h1 className="text-xl font-bold text-left leading-tight">{personal.fullName}</h1>
+                   {(personal.course || personal.rollNo) && (
+                      <p className="text-[11px] text-slate-500 mt-1 leading-snug">
+                         {personal.course} {personal.course && personal.rollNo && '·'} {personal.rollNo && `Roll No: ${personal.rollNo}`}
+                      </p>
+                   )}
+                </div>
              </div>
 
              <div className="space-y-6">
                 <div>
                    <h3 className="text-[11px] font-bold uppercase text-slate-400 mb-3 border-b border-slate-200 pb-1">Contact</h3>
                    <div className="space-y-2 text-[10px] text-slate-600">
-                      <p className="flex items-center gap-2">{personal.email}</p>
-                      <p className="flex items-center gap-2">{personal.phone}</p>
-                      <p className="flex items-center gap-2">{personal.location}</p>
+                      {personal.email && <p className="flex items-center gap-2">{personal.email}</p>}
+                      {personal.email2 && <p className="flex items-center gap-2">{personal.email2}</p>}
+                      {personal.phone && <p className="flex items-center gap-2">{personal.phone}</p>}
+                      {personal.location && <p className="flex items-center gap-2">{personal.location}</p>}
+                      {personal.linkedin && <p className="flex items-center gap-2"><a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="hover:underline text-slate-500">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a></p>}
+                      {personal.github && <p className="flex items-center gap-2"><a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`} className="hover:underline text-slate-500">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</a></p>}
+                      {personal.portfolio && <p className="flex items-center gap-2"><a href={personal.portfolio.startsWith('http') ? personal.portfolio : `https://${personal.portfolio}`} className="hover:underline text-slate-500">{personal.portfolio.replace(/^https?:\/\/(www\.)?/, '')}</a></p>}
                    </div>
                 </div>
                 <div>

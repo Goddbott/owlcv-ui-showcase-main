@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AppShell } from "@/components/AppSidebar";
-import { Sparkles, Search, FileText, Briefcase, Zap, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Sparkles, Search, FileText, Briefcase, Zap, CheckCircle2, AlertCircle, Loader2, Upload } from "lucide-react";
+import { extractTextFromPDF } from "@/lib/pdf-parser";
+import { extractTextFromDocx } from "@/lib/docx-parser";
+import { analyzeResumeAgainstJobDescription, type AIKeywordResult } from "@/lib/gemini";
 
 export const Route = createFileRoute("/optimizer")({
   component: Optimizer,
@@ -9,14 +12,62 @@ export const Route = createFileRoute("/optimizer")({
 
 function Optimizer() {
   const [isScanning, setIsScanning] = useState(false);
-  const [score, setScore] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [resumeText, setResumeText] = useState("");
+  const [jobDescriptionText, setJobDescriptionText] = useState("");
+  const [analysisResult, setAnalysisResult] = useState<AIKeywordResult | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState("");
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleScan = () => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      let extractedText = "";
+      if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+        const result = await extractTextFromPDF(file);
+        extractedText = result.text;
+      } else if (
+        file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
+        file.name.endsWith(".docx")
+      ) {
+        extractedText = await extractTextFromDocx(file);
+      } else {
+        alert("Unsupported file type. Please upload a PDF or DOCX file.");
+        return;
+      }
+      setResumeText(extractedText);
+      setUploadedFileName(file.name);
+    } catch (error) {
+      console.error("Error parsing file:", error);
+      alert("Error parsing file. Please check the console for details.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleScan = async () => {
+    if (!resumeText.trim() || !jobDescriptionText.trim()) {
+      alert("Please provide both a resume and a job description.");
+      return;
+    }
+    
     setIsScanning(true);
-    setTimeout(() => {
-      setScore(Math.floor(Math.random() * (95 - 65 + 1) + 65));
+    try {
+      const result = await analyzeResumeAgainstJobDescription(resumeText, jobDescriptionText);
+      setAnalysisResult(result);
+    } catch (error) {
+      console.error("Analysis failed:", error);
+      alert("Analysis failed. Please try again.");
+    } finally {
       setIsScanning(false);
-    }, 2500);
+    }
   };
 
   return (
@@ -37,12 +88,37 @@ function Optimizer() {
            <div className="space-y-6">
               <div className="card-soft p-6">
                  <div className="flex items-center gap-2 mb-4 text-sm font-bold">
-                    <FileText className="h-4 w-4 text-primary" /> Paste Your Resume
+                    <FileText className="h-4 w-4 text-primary" /> Upload Resume
                  </div>
-                 <textarea 
-                   rows={10} 
-                   placeholder="Paste the text of your resume here..."
-                   className="input-base resize-none text-xs leading-relaxed"
+                 <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${resumeText ? 'border-primary/50 bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/50'}`}
+                 >
+                    {isUploading ? (
+                        <div className="flex flex-col items-center justify-center gap-2">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            <p className="text-sm font-medium">Extracting Text...</p>
+                        </div>
+                    ) : resumeText ? (
+                        <div className="flex flex-col items-center justify-center gap-2">
+                            <FileText className="h-8 w-8 text-primary" />
+                            <p className="text-sm font-medium">{uploadedFileName || "Resume Uploaded Successfully"}</p>
+                            <p className="text-xs text-muted-foreground mt-1">Click to replace</p>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center gap-2">
+                            <Upload className="h-8 w-8 text-muted-foreground mb-2" />
+                            <p className="text-sm font-medium">Click to upload PDF or DOCX</p>
+                            <p className="text-xs text-muted-foreground mt-1">Maximum file size 5MB</p>
+                        </div>
+                    )}
+                 </div>
+                 <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleFileUpload}
+                    accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                    className="hidden" 
                  />
               </div>
 
@@ -54,13 +130,15 @@ function Optimizer() {
                    rows={8} 
                    placeholder="Paste the job description or requirements here..."
                    className="input-base resize-none text-xs leading-relaxed"
+                   value={jobDescriptionText}
+                   onChange={(e) => setJobDescriptionText(e.target.value)}
                  />
               </div>
 
               <button 
                 onClick={handleScan}
-                disabled={isScanning}
-                className="btn-primary w-full py-4 text-sm font-bold shadow-glow"
+                disabled={isScanning || !resumeText.trim() || !jobDescriptionText.trim()}
+                className="btn-primary w-full py-4 text-sm font-bold shadow-glow disabled:opacity-50"
               >
                 {isScanning ? (
                     <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Analyzing Match...</>
@@ -72,7 +150,7 @@ function Optimizer() {
 
            {/* Results */}
            <div className="space-y-6">
-              {score === null ? (
+              {!analysisResult ? (
                  <div className="card-soft flex h-full min-h-[400px] flex-col items-center justify-center p-8 text-center bg-surface-2/30 border-dashed">
                     <Search className="h-12 w-12 text-muted-foreground/30 mb-4" />
                     <h3 className="text-lg font-bold text-muted-foreground">Ready to Scan</h3>
@@ -91,7 +169,7 @@ function Optimizer() {
                                   className="text-primary transition-all duration-1000 ease-out" 
                                   strokeWidth="8" 
                                   strokeDasharray={440} 
-                                  strokeDashoffset={440 - (440 * score) / 100} 
+                                  strokeDashoffset={440 - (440 * analysisResult.score) / 100} 
                                   strokeLinecap="round" 
                                   stroke="currentColor" 
                                   fill="transparent" 
@@ -100,30 +178,42 @@ function Optimizer() {
                                   cy="80" 
                                 />
                             </svg>
-                            <span className="absolute text-5xl font-black text-foreground">{score}%</span>
+                            <span className="absolute text-5xl font-black text-foreground">{analysisResult.score}%</span>
                         </div>
-                        <p className={`mt-6 text-sm font-bold ${score > 80 ? 'text-emerald-600' : 'text-amber-600'}`}>
-                           {score > 80 ? 'Excellent Match!' : 'Strong, but needs improvement'}
+                        <p className={`mt-6 text-sm font-bold ${analysisResult.score > 80 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                           {analysisResult.score > 80 ? 'Excellent Match!' : 'Strong, but needs improvement'}
                         </p>
                     </div>
 
                     <div className="card-soft p-6">
                         <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Keyword Gap Analysis</h3>
                         <div className="space-y-3">
-                            <GapItem label="React Server Components" status="missing" />
-                            <GapItem label="TypeScript / Zod" status="matched" />
-                            <GapItem label="Responsive Design" status="matched" />
-                            <GapItem label="E2E Testing (Cypress)" status="missing" />
-                            <GapItem label="State Management" status="matched" />
+                            {analysisResult.missingKeywords.flatMap((category) => 
+                                category.keywords.map((kw, i) => (
+                                    <GapItem key={`missing-${category.category}-${i}`} label={kw} status="missing" />
+                                ))
+                            )}
+                            {analysisResult.matchedKeywords.flatMap((category) => 
+                                category.keywords.map((kw, i) => (
+                                    <GapItem key={`matched-${category.category}-${i}`} label={kw} status="matched" />
+                                ))
+                            )}
+                            {analysisResult.missingKeywords.length === 0 && analysisResult.matchedKeywords.length === 0 && (
+                                <p className="text-xs text-muted-foreground italic">No specific keywords identified.</p>
+                            )}
                         </div>
                     </div>
 
-                    <div className="card-soft p-6 border-primary/20 bg-primary/5">
-                        <h3 className="text-xs font-bold text-primary uppercase tracking-widest mb-3">OwlAI Suggestion</h3>
-                        <p className="text-xs leading-relaxed text-foreground/80">
-                           "Your resume is strong on core frontend skills but misses explicit mentions of **Testing** and **Performance Optimization**. Adding these could increase your score to **92%**."
-                        </p>
-                    </div>
+                    {analysisResult.suggestions.length > 0 && (
+                        <div className="card-soft p-6 border-primary/20 bg-primary/5">
+                            <h3 className="text-xs font-bold text-primary uppercase tracking-widest mb-3">OwlAI Suggestions</h3>
+                            <ul className="text-xs leading-relaxed text-foreground/80 space-y-2 list-disc pl-4 text-left">
+                                {analysisResult.suggestions.map((suggestion, index) => (
+                                    <li key={index}>{suggestion}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
               )}
            </div>
