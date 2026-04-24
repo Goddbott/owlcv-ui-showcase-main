@@ -95,3 +95,61 @@ Rules for the bullet points:
         : ["Error summarizing project"]; // Fallback
   }
 }
+
+export interface AIKeywordResult {
+  score: number;
+  matchedKeywords: { category: string; keywords: string[] }[];
+  missingKeywords: { category: string; keywords: string[] }[];
+  suggestions: string[];
+}
+
+export async function evaluateATSKeywords(resumeText: string): Promise<AIKeywordResult> {
+  const prompt = `
+You are an expert ATS (Applicant Tracking System) for Software Engineering roles.
+Evaluate the keyword coverage of the following resume text.
+Software Engineering resumes should have a good spread of Programming Languages, Frontend/Backend frameworks, Databases, Cloud/DevOps tools, Testing, and System Design concepts.
+
+Resume Text:
+${resumeText.substring(0, 5000)}
+
+Perform a keyword analysis using standard software engineering expectations:
+1. Identify all technical skills/keywords PRESENT in the resume. Group them by category.
+2. Identify important standard software engineering keywords that are MISSING (e.g., if they have React but no testing framework, list testing frameworks as missing).
+3. Calculate a keyword coverage score from 0 to 100.
+   - 90-100: Excellent coverage of modern tech stack across multiple categories.
+   - 70-89: Good coverage but missing some peripheral areas (e.g., testing or cloud).
+   - <70: Weak technical keyword density.
+
+Respond ONLY with a raw JSON object (no markdown, no backticks) in the following format:
+{
+  "score": 85,
+  "matchedKeywords": [
+    { "category": "Programming Languages", "keywords": ["JavaScript", "TypeScript"] },
+    { "category": "Frontend", "keywords": ["React"] }
+  ],
+  "missingKeywords": [
+    { "category": "Testing", "keywords": ["Jest", "Cypress"] },
+    { "category": "Cloud / DevOps", "keywords": ["Docker", "AWS"] }
+  ],
+  "suggestions": [
+    "Consider adding testing frameworks like Jest or Cypress to improve keyword coverage."
+  ]
+}
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    return JSON.parse(cleanedText) as AIKeywordResult;
+  } catch (error) {
+    console.error("Error evaluating ATS keywords:", error);
+    return {
+      score: 70, // Fallback score
+      matchedKeywords: [],
+      missingKeywords: [],
+      suggestions: ["AI evaluation failed. Could not analyze keywords."]
+    };
+  }
+}
