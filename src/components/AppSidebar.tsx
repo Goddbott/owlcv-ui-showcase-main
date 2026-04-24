@@ -68,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         `}
       >
         <div className={`flex h-16 items-center border-b border-border px-5 ${isCollapsed ? "justify-center px-0" : "justify-between"}`}>
-          <Link to="/">{!isCollapsed ? <Logo /> : <span className="text-2xl">🦉</span>}</Link>
+          <Link to="/">{!isCollapsed ? <Logo /> : <Logo type="icon" className="h-6 mx-auto" />}</Link>
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="hidden md:flex h-8 w-8 items-center justify-center rounded-lg hover:bg-muted text-muted-foreground transition-colors"

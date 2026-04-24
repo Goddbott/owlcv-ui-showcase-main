@@ -1,8 +1,6 @@
-export function Logo({ className = "" }: { className?: string }) {
+export function Logo({ className = "", type = "full" }: { className?: string; type?: "full" | "text" | "icon" }) {
+  const src = type === "full" ? "/assets/logo-full.png" : type === "text" ? "/assets/logo-text.png" : "/assets/logo-icon.png";
   return (
-    <span className={`inline-flex items-center gap-2 font-extrabold tracking-tight ${className}`}>
-      <span className="text-2xl leading-none">🦉</span>
-      <span className="text-primary">OwlCV</span>
-    </span>
+    <img src={src} alt="OwlCV Logo" className={`h-8 w-auto object-contain ${className}`} />
   );
 }

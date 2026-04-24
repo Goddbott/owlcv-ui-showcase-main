@@ -718,7 +718,7 @@ function ResumePreview({ data }: { data: ResumeData }) {
 
   const accentStyles = useMemo(() => {
     const colors: Record<string, string> = {
-      emerald: "#22C55E",
+      emerald: "#14B688",
       slate: "#475569",
       amber: "#F59E0B",
       teal: "#14B8A6",

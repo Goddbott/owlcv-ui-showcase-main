@@ -10,7 +10,7 @@ interface CustomizationPanelProps {
 }
 
 const colors = [
-  { name: "Emerald", value: "emerald", class: "bg-emerald-500" },
+  { name: "Emerald", value: "emerald", class: "bg-[#14B688]" },
   { name: "Slate", value: "slate", class: "bg-slate-600" },
   { name: "Amber", value: "amber", class: "bg-amber-500" },
   { name: "Teal", value: "teal", class: "bg-teal-500" },

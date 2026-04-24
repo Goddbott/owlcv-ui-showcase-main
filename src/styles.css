@@ -1,3 +1,19 @@
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-Thin.ttf') format('truetype'); font-weight: 100; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-ThinItalic.ttf') format('truetype'); font-weight: 100; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-Light.ttf') format('truetype'); font-weight: 300; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-LightItalic.ttf') format('truetype'); font-weight: 300; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-RegularItalic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-MediumItalic.ttf') format('truetype'); font-weight: 500; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-SemiBold.ttf') format('truetype'); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-SemiBoldItalic.ttf') format('truetype'); font-weight: 600; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-BoldItalic.ttf') format('truetype'); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-ExtraBold.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-ExtraBoldItalic.ttf') format('truetype'); font-weight: 800; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-Black.ttf') format('truetype'); font-weight: 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Hellix'; src: url('/fonts/Hellix-BlackItalic.ttf') format('truetype'); font-weight: 900; font-style: italic; font-display: swap; }
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -5,7 +21,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Hellix", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --radius-sm: calc(var(--radius) - 4px);
@@ -60,10 +76,10 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.02 250);
 
-  /* Emerald #22C55E */
-  --primary: oklch(0.72 0.18 145);
+  /* Custom Teal #14B688 */
+  --primary: #14B688;
   --primary-foreground: oklch(1 0 0);
-  --primary-soft: oklch(0.96 0.05 145);
+  --primary-soft: oklch(0.96 0.05 160);
 
   --secondary: oklch(0.97 0.01 145);
   --secondary-foreground: oklch(0.3 0.04 145);
@@ -86,9 +102,9 @@
 
   --border: oklch(0.93 0.01 250);
   --input: oklch(0.93 0.01 250);
-  --ring: oklch(0.72 0.18 145);
+  --ring: #14B688;
 
-  --chart-1: oklch(0.72 0.18 145);
+  --chart-1: #14B688;
   --chart-2: oklch(0.74 0.12 190);
   --chart-3: oklch(0.83 0.16 85);
   --chart-4: oklch(0.86 0.18 125);
@@ -96,12 +112,12 @@
 
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.22 0.02 250);
-  --sidebar-primary: oklch(0.72 0.18 145);
+  --sidebar-primary: #14B688;
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.96 0.05 145);
   --sidebar-accent-foreground: oklch(0.35 0.12 145);
   --sidebar-border: oklch(0.93 0.01 250);
-  --sidebar-ring: oklch(0.72 0.18 145);
+  --sidebar-ring: #14B688;
 }
 
 @layer base {
