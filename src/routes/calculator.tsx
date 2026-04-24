@@ -59,22 +59,21 @@ function CalculatorPage() {
       <div className="grid gap-10 lg:grid-cols-2">
         {/* LEFT: UPLOAD PANEL */}
         <div className="space-y-6">
-            {status === "idle" ? (
-                <div 
+            {!file ? (
+                <label 
+                    htmlFor="resume-upload"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={onDrop}
-                    className="card-soft p-12 text-center border-dashed border-2 hover:bg-primary/5 transition-all cursor-pointer rounded-[2.5rem] group"
+                    className="card-soft p-12 text-center border-dashed border-2 hover:bg-primary/5 transition-all cursor-pointer rounded-[2.5rem] group block"
                 >
                     <input type="file" id="resume-upload" className="hidden" accept=".pdf,.docx" onChange={handleFileUpload} />
-                    <label htmlFor="resume-upload" className="cursor-pointer">
-                        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-muted/40 text-muted-foreground group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
-                            <Upload className="h-10 w-10 group-hover:scale-110 transition-transform" />
-                        </div>
-                        <h3 className="text-xl font-extrabold tracking-tight">Drop your resume here</h3>
-                        <p className="mt-2 text-xs text-muted-foreground">PDF or DOCX (Max 5MB)</p>
-                        <div className="btn-primary mt-8 px-8 py-3 text-sm font-bold shadow-glow inline-block">Browse Local Files</div>
-                    </label>
-                </div>
+                    <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-muted/40 text-muted-foreground group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                        <Upload className="h-10 w-10 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <h3 className="text-xl font-extrabold tracking-tight">Drop your resume here</h3>
+                    <p className="mt-2 text-xs text-muted-foreground">PDF or DOCX (Max 5MB)</p>
+                    <div className="btn-primary mt-8 px-8 py-3 text-sm font-bold shadow-glow inline-block pointer-events-none">Browse Local Files</div>
+                </label>
             ) : (
                 <div className="card-soft p-8 bg-surface ring-1 ring-border shadow-sm">
                     <div className="flex items-center justify-between mb-6">
@@ -106,7 +105,7 @@ function CalculatorPage() {
                                 onClick={startAnalysis} 
                                 className="btn-primary w-full py-5 text-sm font-bold shadow-glow"
                             >
-                                Recalculate Score
+                                {status === "results" ? "Recalculate Score" : "Calculate Score"}
                             </button>
                         </div>
                     )}

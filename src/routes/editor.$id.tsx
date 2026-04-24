@@ -177,43 +177,56 @@ function Editor() {
     const element = document.getElementById('resume-preview-root');
     if (!element) return;
     setDownloading(true);
+
     try {
-      const mod = await import('html2pdf.js');
-      const html2pdf = mod.default || mod;
-      const opt = {
-        margin: 0,
-        filename: `${title.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      };
-      await html2pdf().set(opt).from(element).save();
-    } catch (err) {
-      console.error('html2pdf failed, falling back to print:', err);
-      // Fallback: open print dialog so user can "Save as PDF"
-      const printWindow = window.open('', '_blank');
-      if (printWindow) {
-        const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
-          .map(s => s.outerHTML).join('\n');
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head><title>${title}</title>${styles}
-          <style>
-            @page { size: A4; margin: 0; }
-            body { margin: 0; padding: 0; background: white; }
-            .resume-preview-container { box-shadow: none !important; border: none !important; }
-          </style>
+      // We use a hidden iframe to print seamlessly without opening a new tab or freezing the page with html2canvas.
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = 'none';
+      document.body.appendChild(iframe);
+
+      const contentWindow = iframe.contentWindow;
+      if (!contentWindow) throw new Error('Iframe failed to load');
+
+      // Get all current styles to ensure it looks identical
+      const styles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+        .map(s => s.outerHTML).join('\n');
+
+      contentWindow.document.open();
+      contentWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${title.replace(/[^a-zA-Z0-9]/g, '_')}</title>
+            ${styles}
+            <style>
+              @page { size: A4; margin: 0; }
+              body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .resume-preview-container { box-shadow: none !important; border: none !important; }
+            </style>
           </head>
           <body>${element.innerHTML}</body>
-          </html>
-        `);
-        printWindow.document.close();
-        setTimeout(() => {
-          printWindow.print();
-          printWindow.close();
-        }, 500);
-      }
+        </html>
+      `);
+      contentWindow.document.close();
+
+      // Wait a tiny bit for the browser to render the styles inside the iframe
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      contentWindow.focus();
+      contentWindow.print();
+      
+      // Clean up after print dialog closes
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
+    } catch (err) {
+      console.error('Print failed:', err);
+      alert('Failed to generate PDF. Please try again.');
     } finally {
       setDownloading(false);
     }
