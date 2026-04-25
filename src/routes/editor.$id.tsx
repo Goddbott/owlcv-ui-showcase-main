@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Save, BookOpen, ZoomIn, ZoomOut } from "lucide-react";
+import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Save, BookOpen, ZoomIn, ZoomOut, Edit } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
 import { useResume, ResumeData, Experience, Project, Education, Certification, SkillCategory } from "@/hooks/use-resume";
@@ -124,6 +124,12 @@ function Editor() {
           });
           setTitle(resume.title);
         }
+      } else {
+        const searchParams = new URLSearchParams(window.location.search);
+        const templateParam = searchParams.get("template");
+        if (templateParam) {
+           setData(prev => ({ ...prev, template: templateParam as any }));
+        }
       }
     }
     loadResume();
@@ -134,9 +140,23 @@ function Editor() {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
     
+    let thumbnail = data.thumbnail;
+    try {
+      const element = document.getElementById('resume-preview-root');
+      if (element) {
+        const html2canvasModule = await import('html2canvas');
+        const html2canvas = html2canvasModule.default || html2canvasModule;
+        const canvas = await html2canvas(element, { scale: 0.3, useCORS: true, logging: false });
+        thumbnail = canvas.toDataURL('image/jpeg', 0.5);
+      }
+    } catch (e) {
+      console.error("Failed to generate thumbnail", e);
+    }
+
     // Strip out local logo object URL before saving to database
     const dataToSave = {
       ...data,
+      thumbnail,
       personal: {
         ...data.personal,
         collegeLogo: undefined
@@ -252,34 +272,39 @@ function Editor() {
     <AppShell>
       <div ref={containerRef} className="flex min-h-[calc(100vh-3.5rem)] md:min-h-screen">
         {/* LEFT FORM PANEL */}
-        <div className="border-b border-border md:border-b-0 md:overflow-y-auto md:h-screen bg-surface" style={{ width: `${splitPercent}%`, minWidth: '280px' }}>
+        <div className="relative border-b border-border md:border-b-0 md:overflow-y-auto md:h-screen bg-surface/80 backdrop-blur z-10" style={{ width: `${splitPercent}%`, minWidth: '280px' }}>
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,oklch(0.95_0.08_145)_0%,transparent_70%)] opacity-50 pointer-events-none" />
           <div className="px-6 py-6 pb-24">
             <Link to="/dashboard" className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">
               <ArrowLeft className="h-3 w-3" /> My Resumes
             </Link>
-            <div className="flex items-center justify-between mt-3 group">
-               <input 
-                 value={title}
-                 onChange={(e) => setTitle(e.target.value)}
-                 className="w-full rounded-lg border border-transparent bg-transparent text-2xl font-extrabold focus:border-primary focus:outline-none focus:px-2 transition-all" 
-               />
+            <div className="flex items-center justify-between mt-4">
+               <div className="relative flex-1 mr-4 flex items-center group">
+                 <input 
+                   value={title}
+                   onChange={(e) => setTitle(e.target.value)}
+                   className="w-full rounded-xl border border-transparent bg-transparent text-2xl font-black focus:border-primary focus:bg-white/50 focus:outline-none hover:bg-white/50 focus:px-3 py-1.5 pl-2 pr-8 transition-all peer shadow-sm" 
+                   title="Click to edit title"
+                 />
+                 <Edit className="h-4 w-4 text-primary absolute right-3 pointer-events-none transition-transform peer-focus:scale-110" />
+               </div>
                <div className="flex gap-2">
-                 <button onClick={handleSave} disabled={saving} className="btn-primary py-1.5 px-3 text-xs disabled:opacity-70 whitespace-nowrap">
-                   <Save className="h-3.5 w-3.5 mr-1" /> {saving ? "Saving..." : "Save"}
+                 <button onClick={handleSave} disabled={saving} className="btn-primary py-2 px-4 text-xs font-bold disabled:opacity-70 whitespace-nowrap shadow-glow hover:scale-105 transition-all">
+                   <Save className="h-4 w-4 mr-1.5" /> {saving ? "Saving..." : "Save Resume"}
                  </button>
                </div>
             </div>
 
             {/* Quick Navigation Tabs */}
-            <div className="mt-8 flex items-center gap-1 overflow-x-auto pb-2 no-scrollbar border-b border-border/50 sticky top-0 bg-surface/95 backdrop-blur z-20 -mx-6 px-6">
+            <div className="mt-8 flex items-center gap-2 overflow-x-auto pb-4 no-scrollbar sticky top-0 bg-surface/95 backdrop-blur z-20 -mx-6 px-6 pt-4 border-b border-border/50">
               {sections.map((section) => (
                 <button
                   key={section}
                   onClick={() => setActiveSection(section)}
-                  className={`whitespace-nowrap px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-all border-b-2 ${
+                  className={`whitespace-nowrap px-4 py-2 text-[11px] font-bold uppercase tracking-widest rounded-full transition-all border ${
                     activeSection === section 
-                      ? 'border-primary text-primary bg-primary/5' 
-                      : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      ? 'border-primary bg-primary text-white shadow-glow' 
+                      : 'border-transparent text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                   }`}
                 >
                   {section}
@@ -289,9 +314,9 @@ function Editor() {
             
             {/* Section Stepper Header */}
             <div className="mt-8">
-              <nav className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-extrabold text-primary">
+              <nav className="flex justify-between items-center mb-8">
+                <h2 className="text-xl font-extrabold flex items-center gap-3">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10 text-sm font-black text-primary ring-1 ring-primary/20 shadow-sm">
                     {currentIndex + 1}
                   </span>
                   {activeSection}
@@ -323,12 +348,12 @@ function Editor() {
               </div>
             </div>
 
-            <div className="sticky bottom-0 mt-12 -mx-6 border-t border-border bg-surface/95 px-6 py-4 backdrop-blur flex gap-3">
-              <button disabled={currentIndex === 0} onClick={prevSection} className="btn-outline flex-1 py-3 text-xs font-bold"><ChevronLeft className="mr-1 h-3 w-3" /> Previous</button>
+            <div className="sticky bottom-0 mt-12 -mx-6 border-t border-border bg-surface/95 px-6 py-4 backdrop-blur flex gap-3 z-30">
+              <button disabled={currentIndex === 0} onClick={prevSection} className="btn-outline flex-1 py-3 text-sm font-bold shadow-sm hover:bg-muted"><ChevronLeft className="mr-1 h-4 w-4" /> Previous</button>
               {currentIndex === sections.length - 1 ? (
-                 <button className="flex-[2] rounded-full gradient-emerald px-6 py-3 text-xs font-bold text-white shadow-glow"><Sparkles className="mr-2 inline h-4 w-4" /> Finalize Resume</button>
+                 <button className="flex-[2] rounded-full gradient-emerald px-6 py-3 text-sm font-bold text-white shadow-glow hover:scale-[1.02] transition-transform"><Sparkles className="mr-2 inline h-4 w-4" /> Finalize Resume</button>
               ) : (
-                <button onClick={nextSection} className="btn-primary flex-[2] py-3 text-xs font-bold">Continue to {sections[currentIndex + 1]} <ChevronRight className="ml-1 h-3 w-3" /></button>
+                <button onClick={nextSection} className="btn-primary flex-[2] py-3 text-sm font-bold shadow-glow hover:scale-[1.02] transition-transform">Continue to {sections[currentIndex + 1]} <ChevronRight className="ml-1 h-4 w-4" /></button>
               )}
             </div>
           </div>
@@ -343,7 +368,8 @@ function Editor() {
         </div>
 
         {/* RIGHT PREVIEW PANEL */}
-        <div className="bg-surface-2/40 md:overflow-y-auto md:h-screen flex-1 min-w-[300px] flex flex-col">
+        <div className="relative bg-surface-2/40 md:overflow-y-auto md:h-screen flex-1 min-w-[300px] flex flex-col">
+          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-emerald-500/5 via-transparent to-amber-500/5 pointer-events-none" />
           <div className="sticky top-0 z-10 border-b border-border bg-surface/90 backdrop-blur">
             <div className="flex items-center justify-between px-6 py-3">
                 <div className="flex items-center gap-2">
@@ -713,7 +739,7 @@ function CodingProfilesSection({ codingProfiles, addCodingProfile, updateCodingP
   );
 }
 
-function ResumePreview({ data }: { data: ResumeData }) {
+export function ResumePreview({ data }: { data: ResumeData }) {
   const { personal, experience, education, skills, projects, accentColor, template, settings } = data;
 
   const accentStyles = useMemo(() => {

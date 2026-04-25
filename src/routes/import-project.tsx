@@ -68,21 +68,25 @@ function ImportProject() {
 
   return (
     <AppShell>
+      <div className="relative min-h-screen pb-20">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,oklch(0.95_0.08_145)_0%,transparent_70%)] opacity-60 pointer-events-none" />
       <div className="mx-auto max-w-4xl px-6 py-10">
         <Link to="/dashboard" className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors">
           <ArrowLeft className="h-3 w-3" /> Back to Dashboard
         </Link>
         
         <div className="mt-6 flex flex-col gap-2">
+          <div className="flex items-center gap-2 mb-2"><span className="pill-green"><Sparkles className="h-3 w-3" /> AI Powered</span></div>
           <h1 className="text-3xl font-extrabold tracking-tight">Import GitHub Project</h1>
           <p className="text-sm text-muted-foreground">Turn any repository into a professional resume project entry in seconds.</p>
         </div>
 
         {status === "idle" || status === "fetching" || status === "processing" ? (
           <div className="mt-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className={`card-soft p-8 text-center transition-all ${status !== 'idle' ? 'opacity-50 pointer-events-none' : ''}`}>
-               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                  <Github className="h-8 w-8" />
+            <div className={`card-soft relative overflow-hidden p-12 text-center transition-all shadow-sm hover:shadow-glow group ${status !== 'idle' ? 'opacity-50 pointer-events-none' : ''}`}>
+               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none" />
+               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary transition-transform group-hover:scale-110 shadow-sm group-hover:shadow-glow">
+                  <Github className="h-10 w-10" />
                </div>
                <h2 className="text-lg font-bold">Paste Repository URL</h2>
                <p className="mt-1 text-xs text-muted-foreground">Public repositories only. We'll analyze the code and content.</p>
@@ -93,9 +97,9 @@ function ImportProject() {
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       placeholder="https://github.com/facebook/react" 
-                      className="input-base py-4 px-6 text-base group-focus-within:ring-primary/20 transition-all font-mono text-sm" 
+                      className="w-full rounded-2xl border border-border bg-surface px-6 py-5 text-base font-mono shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10" 
                     />
-                    <Terminal className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50 opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                    <Terminal className="absolute right-6 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground/50 opacity-0 group-focus-within:opacity-100 transition-opacity" />
                   </div>
                   
                   {error && (
@@ -107,9 +111,9 @@ function ImportProject() {
                   <button 
                     onClick={handleImport}
                     disabled={!url || status !== 'idle'} 
-                    className="btn-primary w-full py-4 text-sm font-bold mt-2"
+                    className="w-full rounded-full gradient-emerald py-4 text-sm font-bold mt-2 text-white shadow-glow hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 transition-all flex items-center justify-center gap-2"
                   >
-                    Generate Resume Entry
+                    <Sparkles className="h-4 w-4" /> Generate Resume Entry
                   </button>
                </div>
             </div>
@@ -133,27 +137,27 @@ function ImportProject() {
         ) : (
           <div className="mt-10 space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600">
-                        <Sparkles className="h-5 w-5" />
+                <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-600 shadow-sm">
+                        <Sparkles className="h-6 w-6" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold">Generated Project</h2>
-                        <p className="text-xs text-muted-foreground">Review and edit before saving to your library.</p>
+                        <h2 className="text-2xl font-extrabold tracking-tight">Generated Project</h2>
+                        <p className="text-xs text-muted-foreground mt-1">Review and edit before saving to your library.</p>
                     </div>
                 </div>
-                <button onClick={() => setStatus("idle")} className="btn-ghost text-xs"><X className="h-4 w-4" /> Start Over</button>
+                <button onClick={() => setStatus("idle")} className="btn-ghost text-xs hover:bg-muted font-bold"><X className="h-4 w-4" /> Start Over</button>
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[1fr_350px]">
                 <div className="space-y-6">
-                    <div className="card-soft p-6 space-y-6">
+                    <div className="card-soft p-8 space-y-8 ring-1 ring-border shadow-sm">
                         <div>
                             <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Project Title</label>
                             <input 
                               value={project?.title} 
                               onChange={(e) => setProject(p => p ? {...p, title: e.target.value} : null)}
-                              className="input-base text-lg font-bold py-3" 
+                              className="w-full rounded-xl border border-transparent bg-muted/50 text-xl font-extrabold focus:border-primary focus:bg-transparent focus:outline-none focus:ring-4 focus:ring-primary/10 py-3 px-4 transition-all" 
                             />
                         </div>
 
@@ -170,7 +174,7 @@ function ImportProject() {
                                             newBullets[idx] = e.target.value;
                                             setProject(p => p ? {...p, description: newBullets} : null);
                                           }}
-                                          className="input-base pr-10 py-3 resize-none" 
+                                          className="input-base pr-10 py-3 resize-none bg-surface hover:bg-muted/30 focus:bg-surface focus:ring-2 focus:ring-primary/20 transition-all text-sm leading-relaxed" 
                                         />
                                         <button 
                                           onClick={() => {
@@ -218,20 +222,20 @@ function ImportProject() {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="card-soft p-6 bg-surface-2/40 border-primary/20 ring-4 ring-primary/5">
-                        <div className="flex items-center gap-2 mb-4 text-xs font-bold text-primary">
+                    <div className="card-soft p-8 bg-gradient-to-br from-surface-2 to-surface border-primary/20 ring-1 ring-primary/10 shadow-soft">
+                        <div className="flex items-center gap-2 mb-4 text-xs font-bold text-primary uppercase tracking-widest">
                             <FileText className="h-4 w-4" /> Entry Summary
                         </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
+                        <p className="text-sm text-muted-foreground leading-relaxed">
                             This entry will be saved to your reusable project library. You can insert it into any future resume with one click.
                         </p>
-                        <div className="mt-6 space-y-3">
+                        <div className="mt-8 space-y-3">
                             <button 
                               onClick={handleSave}
                               disabled={status === 'saving'}
-                              className="btn-primary w-full py-4 text-sm font-bold shadow-glow"
+                              className="w-full rounded-full gradient-emerald py-4 text-sm font-bold text-white shadow-glow hover:scale-[1.02] transition-transform flex items-center justify-center gap-2"
                             >
-                                {status === 'saving' ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4 mr-2" /> Save to Library</>}
+                                {status === 'saving' ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Check className="h-4 w-4" /> Save to Library</>}
                             </button>
                             <button disabled={status === 'saving'} onClick={() => setStatus("idle")} className="btn-outline w-full py-3 text-xs font-bold">Discard</button>
                         </div>
@@ -247,6 +251,7 @@ function ImportProject() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </AppShell>
   );

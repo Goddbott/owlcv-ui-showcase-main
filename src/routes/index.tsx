@@ -25,7 +25,14 @@ function Landing() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,oklch(0.95_0.08_145)_0%,transparent_70%)]" />
         <div className="mx-auto max-w-6xl px-5 pt-20 pb-16 text-center">
-          <span className="pill-amber mx-auto mb-6 inline-flex"><Sparkles className="h-3 w-3" /> New ✨ Gemini-powered AI optimizer</span>
+          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full bg-emerald-100 p-1 pr-4 text-sm font-semibold text-emerald-950">
+            <span className="rounded-full bg-white px-3 py-1 text-emerald-950">
+              New
+            </span>
+            <span className="flex items-center gap-1.5">
+              ✨ Gemini-powered AI optimizer
+            </span>
+          </div>
           <h1 className="mx-auto max-w-4xl text-5xl font-extrabold leading-[1.05] text-foreground md:text-6xl">
             Build Your Perfect Resume with <span className="text-primary">AI</span> — in Minutes.
           </h1>
@@ -37,62 +44,25 @@ function Landing() {
             <Link to="/upload" className="btn-outline px-6 py-3 text-base"><Upload className="h-4 w-4" /> Upload & Optimize</Link>
           </div>
 
-          {/* Mock UI Frame */}
+          {/* Hero Owl Mascot */}
+          <div className="relative mt-12 flex justify-center">
+            <div className="absolute -inset-16 rounded-full bg-primary/15 blur-[100px]" />
+            <img 
+              src="/assets/hero_owl_mascot.png" 
+              alt="OwlCV Hero Mascot" 
+              className="relative w-full max-w-[320px] h-auto drop-shadow-2xl"
+            />
+          </div>
+
+          {/* Actual Editor Preview */}
           <div className="relative mx-auto mt-16 max-w-5xl">
-            <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-tr from-primary/20 via-amber/15 to-teal/20 blur-2xl" />
-            <div className="relative overflow-hidden rounded-3xl border border-border bg-surface shadow-card">
-              <div className="flex items-center gap-2 border-b border-border bg-surface-2 px-4 py-3">
-                <div className="flex gap-1.5">
-                  <span className="h-3 w-3 rounded-full bg-red-400" />
-                  <span className="h-3 w-3 rounded-full bg-amber" />
-                  <span className="h-3 w-3 rounded-full bg-primary" />
-                </div>
-                <div className="ml-3 rounded-md bg-muted px-3 py-1 text-xs font-mono text-muted-foreground">owlcv.app/editor/sarah-johnson</div>
-              </div>
-              <div className="grid gap-6 p-8 md:grid-cols-[1fr_1.4fr]">
-                <div className="space-y-3">
-                  <div className="rounded-xl bg-muted/60 p-3">
-                    <p className="text-[10px] font-bold uppercase text-muted-foreground">Personal</p>
-                    <div className="mt-2 space-y-2">
-                      <div className="h-7 rounded-md bg-white" />
-                      <div className="h-7 rounded-md bg-white" />
-                    </div>
-                  </div>
-                  <div className="rounded-xl bg-muted/60 p-3">
-                    <p className="text-[10px] font-bold uppercase text-muted-foreground">Experience</p>
-                    <div className="mt-2 space-y-2">
-                      <div className="h-7 rounded-md bg-white" />
-                      <div className="h-14 rounded-md bg-white" />
-                    </div>
-                  </div>
-                  <button className="btn-primary w-full"><Sparkles className="h-3.5 w-3.5" /> AI Optimize</button>
-                </div>
-                <div className="rounded-xl bg-white p-6 shadow-soft ring-1 ring-border">
-                  <div className="border-b border-primary/30 pb-3">
-                    <p className="text-xl font-extrabold">Sarah Johnson</p>
-                    <p className="text-sm text-primary">Senior UX Designer</p>
-                    <p className="mt-1 text-[10px] text-muted-foreground">sarah@example.com · San Francisco · linkedin.com/in/sarah</p>
-                  </div>
-                  <div className="mt-3 space-y-3">
-                    <div>
-                      <p className="text-xs font-bold text-primary">EXPERIENCE</p>
-                      <div className="mt-1 space-y-1">
-                        <div className="resume-line w-11/12" />
-                        <div className="resume-line w-10/12" />
-                        <div className="resume-line w-9/12" />
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-primary">SKILLS</p>
-                      <div className="mt-1 flex flex-wrap gap-1">
-                        {["Figma", "Design Systems", "Research", "Prototyping", "Webflow"].map((s) => (
-                          <span key={s} className="rounded-full bg-primary-soft px-2 py-0.5 text-[10px] font-semibold text-[color:var(--accent-foreground)]">{s}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <div className="absolute -inset-6 rounded-[2.5rem] bg-gradient-to-tr from-primary/20 via-amber/15 to-teal/20 blur-2xl opacity-60" />
+            <div className="relative overflow-hidden rounded-3xl border border-border bg-surface shadow-2xl">
+              <img 
+                src="/assets/editor_preview.png" 
+                alt="OwlCV AI Editor Preview" 
+                className="w-full h-auto object-cover"
+              />
             </div>
           </div>
 
@@ -113,26 +83,13 @@ function Landing() {
         toLink="/templates"
         reverse={false}
         visual={
-          <div className="card-soft overflow-hidden">
-            <div className="flex border-b border-border bg-surface-2 px-3 py-2 text-xs font-mono text-muted-foreground">editor.owlcv.app</div>
-            <div className="grid grid-cols-2 gap-3 p-4">
-              <div className="space-y-2">
-                <div className="h-6 rounded bg-muted" />
-                <div className="h-6 rounded bg-muted" />
-                <div className="h-16 rounded bg-muted" />
-                <div className="rounded bg-primary py-1.5 text-center text-[10px] font-bold text-white">+ Add Section</div>
-              </div>
-              <div className="rounded-lg bg-white p-3 ring-1 ring-border">
-                <div className="h-3 w-3/4 rounded bg-foreground/80" />
-                <div className="mt-1 h-2 w-1/2 rounded bg-primary/60" />
-                <div className="mt-3 space-y-1">
-                  <div className="resume-line w-full" />
-                  <div className="resume-line w-11/12" />
-                  <div className="resume-line w-10/12" />
-                  <div className="resume-line w-9/12" />
-                </div>
-              </div>
-            </div>
+          <div className="relative flex justify-center items-center p-4">
+            <div className="absolute -inset-12 rounded-full bg-primary/15 blur-3xl opacity-60" />
+            <img 
+              src="/assets/create_resume_owl.png" 
+              alt="Create Resume with OwlCV" 
+              className="relative w-full max-w-[320px] h-auto drop-shadow-xl animate-in fade-in zoom-in duration-700"
+            />
           </div>
         }
       />
@@ -146,25 +103,13 @@ function Landing() {
         toLink="/"
         reverse
         visual={
-          <div className="card-soft p-5">
-            <div className="mb-3 flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">🦉</span>
-              <p className="text-sm font-bold">AI Suggestions</p>
-              <span className="pill-green ml-auto">Live</span>
-            </div>
-            <div className="space-y-2">
-              {[
-                "Added quantified achievements",
-                "Improved summary clarity",
-                "Added 12 industry keywords",
-                "Shortened long bullet points",
-                "Improved ATS readability",
-              ].map((s) => (
-                <div key={s} className="flex items-center gap-2 rounded-lg bg-primary-soft px-3 py-2 text-sm font-medium text-[color:var(--accent-foreground)]">
-                  <Check className="h-4 w-4 text-primary" /> {s}
-                </div>
-              ))}
-            </div>
+          <div className="relative flex justify-center items-center p-4">
+            <div className="absolute -inset-16 rounded-full bg-primary/20 blur-[100px] animate-pulse" />
+            <img 
+              src="/assets/owl_ai.png" 
+              alt="Owl AI Core" 
+              className="relative w-full max-w-[380px] h-auto drop-shadow-2xl animate-in fade-in slide-in-from-right-12 duration-1000"
+            />
           </div>
         }
       />
@@ -178,11 +123,13 @@ function Landing() {
         toLink="/upload"
         reverse={false}
         visual={
-          <div className="card-soft flex flex-col items-center justify-center gap-3 border-2 border-dashed border-primary/40 bg-primary-soft/30 p-12 text-center">
-            <Cloud className="h-10 w-10 text-primary" />
-            <p className="text-sm font-bold">Drop your PDF or DOCX</p>
-            <p className="text-xs text-muted-foreground">or click to browse</p>
-            <div className="flex gap-2"><span className="pill-muted">PDF</span><span className="pill-muted">DOCX</span></div>
+          <div className="relative flex justify-center items-center p-4">
+            <div className="absolute -inset-20 rounded-full bg-emerald/25 blur-[100px] opacity-80" />
+            <img 
+              src="/assets/upload_optimise_owl.png" 
+              alt="Upload and Enhance" 
+              className="relative w-full max-w-[320px] h-auto drop-shadow-xl animate-in fade-in zoom-in duration-700 delay-200"
+            />
           </div>
         }
       />
@@ -196,29 +143,37 @@ function Landing() {
         toLink="/editor/sarah"
         reverse
         visual={
-          <div className="grid grid-cols-2 gap-4">
-            <div className="card-soft overflow-hidden p-4">
-              <div className="aspect-square rounded-xl bg-gradient-to-br from-amber/40 to-teal/30" />
-              <p className="mt-3 text-center text-xs font-semibold text-muted-foreground">Before</p>
-            </div>
-            <div className="card-soft overflow-hidden p-4">
-              <div className="aspect-square rounded-xl bg-[conic-gradient(from_45deg,_oklch(0.96_0.005_250),_oklch(0.99_0.005_250))]" />
-              <p className="mt-3 text-center text-xs font-semibold text-primary">After ✨</p>
-            </div>
+          <div className="relative flex justify-center items-center p-4">
+            <div className="absolute -inset-16 rounded-full bg-amber/15 blur-[80px]" />
+            <img 
+              src="/assets/bg_remove_owl.png" 
+              alt="AI Background Removal Comparison" 
+              className="relative w-full max-w-[550px] h-auto drop-shadow-2xl animate-in fade-in zoom-in duration-700"
+            />
           </div>
         }
       />
 
-      {/* FEATURE 5 — green tinted full width */}
-      <section className="bg-primary-soft/60 py-24">
-        <div className="mx-auto max-w-5xl px-5 text-center">
+      {/* FEATURE 5 — Share Section */}
+      <section className="bg-primary-soft/40 py-24 relative overflow-hidden">
+        <div className="mx-auto max-w-5xl px-5 text-center relative z-10">
+          <div className="mb-8 flex justify-center">
+            <div className="relative">
+              <div className="absolute -inset-6 rounded-full bg-primary/5 blur-2xl" />
+              <img 
+                src="/assets/share_resume_owl.png" 
+                alt="Share your resume" 
+                className="relative w-full max-w-[280px] h-auto drop-shadow-xl animate-in fade-in slide-in-from-bottom-8 duration-700"
+              />
+            </div>
+          </div>
           <span className="pill-green mb-4 inline-flex">Share</span>
           <h2 className="text-4xl font-extrabold md:text-5xl">Share your resume as a live link</h2>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">Every resume gets its own beautiful public URL. Send it to recruiters, paste it on LinkedIn, share it anywhere.</p>
           <div className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-full border border-border bg-surface px-4 py-3 shadow-soft">
             <span className="text-sm">🔗</span>
             <code className="flex-1 text-left text-sm font-mono text-foreground">owlcv.app/r/john-doe-software-engineer</code>
-            <button className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white">Copy</button>
+            <button className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white shadow-sm hover:brightness-110 active:scale-95 transition-all">Copy</button>
           </div>
           <Link to="/r/$username" params={{ username: "sarah-johnson" }} className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline">See live preview example <ArrowRight className="h-4 w-4" /></Link>
         </div>
@@ -228,12 +183,14 @@ function Landing() {
       <section className="mx-auto max-w-7xl px-5 py-24">
         <div className="grid gap-6 md:grid-cols-3">
           {[
-            { icon: "🦉", text: "We're making job applications easier for everyone", sub: "Built by humans, powered by AI." },
-            { icon: "🦉", text: "Multiple resume templates — pick your style", sub: "Modern, classic, creative or minimal." },
-            { icon: "🦉", text: "Your data stays yours", sub: "Private, secure, and downloadable any time." },
+            { img: "/assets/job_offer_owl.png", text: "We're making job applications easier for everyone", sub: "Built by humans, powered by AI." },
+            { img: "/assets/templates_owl.png", text: "Multiple resume templates — pick your style", sub: "Modern, classic, creative or minimal." },
+            { img: "/assets/privacy_security_owl.png", text: "Your data stays yours", sub: "Private, secure, and downloadable any time." },
           ].map((o) => (
             <div key={o.text} className="card-soft flex flex-col items-start gap-4 p-8 transition-transform hover:-translate-y-1">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-soft text-4xl">{o.icon}</div>
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-primary-soft overflow-hidden">
+                <img src={o.img} alt="Owl icon" className="w-full h-full object-contain p-2" />
+              </div>
               <p className="text-lg font-bold leading-snug">{o.text}</p>
               <p className="text-sm text-muted-foreground">{o.sub}</p>
             </div>
@@ -268,21 +225,27 @@ function Landing() {
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { name: "Modern", accent: "emerald" as const },
-            { name: "Classic", accent: "slate" as const },
-            { name: "Creative", accent: "amber" as const },
-            { name: "Minimal", accent: "teal" as const },
+            { name: "Jake's Template", template: "latex", img: "/assets/Jake.jpg", accent: "slate" as const },
+            { name: "IIITA Template", template: "iiita", img: "/assets/IIITA.jpg", accent: "emerald" as const },
+            { name: "Modern", template: "modern", accent: "emerald" as const },
+            { name: "Minimal", template: "minimal", accent: "teal" as const },
           ].map((t) => (
-            <div key={t.name} className="group relative cursor-pointer">
+            <Link key={t.name} to="/editor/$id" params={{ id: "new" }} search={`template=${t.template}`} className="group relative block cursor-pointer">
               <div className="transition-all group-hover:-translate-y-1 group-hover:ring-2 group-hover:ring-primary rounded-xl">
-                <ResumeThumb accent={t.accent} />
+                {t.img ? (
+                  <div className="relative aspect-[1/1.414] overflow-hidden rounded-xl border border-border bg-muted">
+                    <img src={t.img} alt={t.name} className="absolute inset-0 h-full w-full object-cover object-top" />
+                  </div>
+                ) : (
+                  <ResumeThumb accent={t.accent} className="!aspect-[1/1.414]" />
+                )}
               </div>
               <div className="mt-4 flex items-center justify-between">
-                <p className="font-bold">{t.name}</p>
+                <p className="font-bold text-foreground group-hover:text-primary transition-colors">{t.name}</p>
                 <span className="pill-muted">Free</span>
               </div>
-              <button className="absolute inset-x-6 top-1/2 -translate-y-1/2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white opacity-0 shadow-glow transition-opacity group-hover:opacity-100">Use Template</button>
-            </div>
+              <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 rounded-full bg-primary py-2 text-center text-xs font-bold text-white opacity-0 shadow-glow transition-opacity group-hover:opacity-100">Use Template</div>
+            </Link>
           ))}
         </div>
         <div className="mt-10 text-center">
@@ -322,8 +285,14 @@ function Landing() {
 
       {/* FINAL CTA */}
       <section className="mx-auto max-w-7xl px-5 py-16">
-        <div className="rounded-3xl gradient-emerald px-8 py-16 text-center text-white shadow-glow">
-          <span className="text-5xl">🦉</span>
+        <div className="rounded-3xl gradient-emerald px-8 py-16 text-center text-white shadow-glow relative overflow-hidden">
+          <div className="mb-6 flex justify-center">
+            <img 
+              src="/assets/job_search_owl.png" 
+              alt="Land your next job" 
+              className="w-full max-w-[200px] h-auto drop-shadow-lg animate-bounce-slow"
+            />
+          </div>
           <h2 className="mt-4 text-4xl font-extrabold md:text-5xl">Ready to land your next job?</h2>
           <p className="mx-auto mt-4 max-w-xl text-white/90">Join thousands of job seekers building beautiful, AI-optimized resumes with OwlCV.</p>
           <Link to="/signup" className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-8 py-3 text-base font-bold text-primary shadow-soft hover:scale-[1.02] transition-transform">

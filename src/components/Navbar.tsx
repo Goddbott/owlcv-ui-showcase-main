@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 const links = [
   { label: "Dashboard", to: "/dashboard" },
   { label: "Calculator", to: "/calculator" },
-  { label: "ATS Optimizer", to: "/optimizer" },
+  { label: "Skill Gap Scanner", to: "/optimizer" },
   { label: "Resources", to: "/resources" },
 ] as const;
 

@@ -75,7 +75,7 @@ function Optimizer() {
       <div className="mx-auto max-w-5xl px-6 py-6 md:px-10 md:py-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold tracking-tight">ATS Optimizer</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">Skill Gap Scanner</h1>
             <p className="mt-1 text-sm text-muted-foreground">Compare your resume with any job description to get an instant match score.</p>
           </div>
           <div className="rounded-full bg-primary/10 px-4 py-2 text-xs font-bold text-primary flex items-center gap-2">

@@ -13,8 +13,10 @@ export const Route = createFileRoute("/templates")({
 const filters = ["All", "Modern", "Classic", "Creative", "Minimal"] as const;
 
 const templates = [
-  { name: "Jake's Template", category: "Classic", template: "latex", accent: "slate" as const },
-  { name: "IIITA Template", category: "College", template: "iiita", accent: "emerald" as const },
+  { name: "Jake's Template", category: "Classic", template: "latex", img: "/assets/Jake.jpg", accent: "slate" as const },
+  { name: "IIITA Template", category: "College", template: "iiita", img: "/assets/IIITA.jpg", accent: "emerald" as const },
+  { name: "Modern Template", category: "Modern", template: "modern", accent: "emerald" as const },
+  { name: "Minimal Template", category: "Minimal", template: "minimal", accent: "teal" as const },
 ];
 
 function Templates() {
@@ -46,12 +48,18 @@ function Templates() {
           {visible.map((t, i) => {
             const selected = i === 0;
             return (
-              <div key={t.name} className="group relative">
+              <Link key={t.name} to="/editor/$id" params={{ id: "new" }} search={`template=${t.template}`} className="group relative block">
                 <div className={`card-soft overflow-hidden p-4 transition-all ${selected ? "ring-2 ring-primary" : "group-hover:ring-2 group-hover:ring-primary"}`}>
-                  <ResumeThumb accent={t.accent} />
+                  {t.img ? (
+                    <div className="relative aspect-[1/1.414] overflow-hidden rounded-xl border border-border bg-muted">
+                      <img src={t.img} alt={t.name} className="absolute inset-0 h-full w-full object-cover object-top" />
+                    </div>
+                  ) : (
+                    <ResumeThumb accent={t.accent} className="!aspect-[1/1.414]" />
+                  )}
                   <div className="mt-4 flex items-center justify-between">
                     <div>
-                      <p className="font-bold">{t.name}</p>
+                      <p className="font-bold text-foreground group-hover:text-primary transition-colors">{t.name}</p>
                       <p className="text-xs text-muted-foreground">{t.category}</p>
                     </div>
                     {selected ? (
@@ -62,11 +70,11 @@ function Templates() {
                   </div>
                 </div>
                 {!selected && (
-                  <button className="absolute inset-x-10 top-1/3 rounded-full bg-primary py-2 text-xs font-bold text-white opacity-0 shadow-glow transition-opacity group-hover:opacity-100">
+                  <div className="absolute inset-x-10 top-1/3 rounded-full bg-primary py-2 text-center text-xs font-bold text-white opacity-0 shadow-glow transition-opacity group-hover:opacity-100">
                     Use This Template
-                  </button>
+                  </div>
                 )}
-              </div>
+              </Link>
             );
           })}
         </div>

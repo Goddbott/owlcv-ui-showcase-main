@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Upload, FileText, Zap, Loader2, Gauge, CheckCircle2, AlertCircle, ArrowRight, X, MinusCircle, PlusCircle, Lightbulb } from "lucide-react";
+import { Upload, FileText, Zap, Loader2, Gauge, CheckCircle2, AlertCircle, ArrowRight, X, MinusCircle, PlusCircle, Lightbulb, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { extractTextFromPDF } from "@/lib/pdf-parser";
 import { calculateATSScore, ATSResult } from "@/lib/ats-logic";
@@ -81,14 +81,17 @@ function CalculatorPage() {
 
   return (
     <AppShell>
+      <div className="relative min-h-screen pb-20">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,oklch(0.95_0.08_145)_0%,transparent_70%)] opacity-60 pointer-events-none" />
       <div className="mx-auto max-w-6xl px-6 py-10 md:px-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3">
-             <Zap className="h-10 w-10 text-primary fill-primary/10" /> 
+          <span className="pill-amber bg-amber-100 text-amber-700 mb-4 inline-flex"><Sparkles className="h-3 w-3" /> Professional Tool</span>
+          <h1 className="text-4xl font-extrabold tracking-tight flex items-center gap-3">
+             <Zap className="h-10 w-10 text-primary fill-primary/20" /> 
              Software Engineering ATS Calculator
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground max-w-xl">
+          <p className="mt-3 text-lg text-muted-foreground max-w-2xl">
              Upload your software engineering resume to see exactly how hiring algorithms parse your data. Uses deterministic rule-based scoring (no AI).
           </p>
         </div>
@@ -102,26 +105,27 @@ function CalculatorPage() {
                     htmlFor="resume-upload"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={onDrop}
-                    className="card-soft p-12 text-center border-dashed border-2 hover:bg-primary/5 transition-all cursor-pointer rounded-[2.5rem] group block"
+                    className="card-soft relative overflow-hidden p-12 text-center border-dashed border-2 hover:border-primary/50 hover:bg-primary/5 hover:ring-4 hover:ring-primary/10 transition-all cursor-pointer rounded-[2.5rem] group block shadow-sm hover:shadow-glow"
                 >
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none" />
                     <input type="file" id="resume-upload" className="hidden" accept=".pdf" onChange={handleFileUpload} />
-                    <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-muted/40 text-muted-foreground group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                    <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-muted/50 text-muted-foreground group-hover:bg-primary group-hover:text-white transition-all shadow-sm group-hover:shadow-glow">
                         <Upload className="h-10 w-10 group-hover:scale-110 transition-transform" />
                     </div>
                     <h3 className="text-xl font-extrabold tracking-tight">Drop your resume</h3>
                     <p className="mt-2 text-xs text-muted-foreground">PDF only (Max 5MB)</p>
-                    <div className="btn-primary mt-8 px-8 py-3 text-sm font-bold shadow-glow inline-block pointer-events-none">Browse Local Files</div>
+                    <div className="btn-primary mt-8 px-8 py-3 text-sm font-bold shadow-glow inline-block pointer-events-none group-hover:scale-[1.02] transition-transform">Browse Local Files</div>
                 </label>
             ) : (
                 <div className="card-soft p-8 bg-surface ring-1 ring-border shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between mb-6 gap-4">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-soft text-primary shrink-0">
                                 <FileText className="h-5 w-5" />
                             </div>
-                            <div className="overflow-hidden">
-                                <p className="text-sm font-bold truncate">{file?.name}</p>
-                                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Selected Resume</p>
+                            <div className="overflow-hidden min-w-0 flex-1">
+                                <p className="text-sm font-bold truncate" title={file?.name}>{file?.name}</p>
+                                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest mt-0.5">Selected Resume</p>
                             </div>
                         </div>
                         <button onClick={reset} className="p-2 text-muted-foreground hover:text-destructive transition-colors shrink-0"><X className="h-4 w-4" /></button>
@@ -141,9 +145,9 @@ function CalculatorPage() {
                             </div>
                             <button 
                                 onClick={startAnalysis} 
-                                className="btn-primary w-full py-5 text-sm font-bold shadow-glow"
+                                className="w-full rounded-full gradient-emerald py-5 text-sm font-bold text-white shadow-glow hover:scale-[1.02] transition-transform flex justify-center items-center gap-2"
                             >
-                                {status === "results" ? "Recalculate Score" : "Calculate ATS Score"}
+                                <Sparkles className="h-4 w-4" /> {status === "results" ? "Recalculate Score" : "Calculate ATS Score"}
                             </button>
                         </div>
                     )}
@@ -187,8 +191,11 @@ function CalculatorPage() {
             ) : (
                 <div className="animate-in fade-in slide-in-from-right-8 duration-700 space-y-6">
                     {/* TOP HERO SCORE */}
-                    <div className="card-soft p-10 text-center bg-gradient-to-br from-primary/5 via-surface to-amber/5 ring-1 ring-primary/20 flex flex-col md:flex-row items-center justify-center gap-10">
-                        <div className="relative inline-flex items-center justify-center shrink-0">
+                    <div className="card-soft relative overflow-hidden p-10 text-center bg-gradient-to-br from-primary/5 via-surface to-amber/5 ring-1 ring-primary/20 flex flex-col md:flex-row items-center justify-center gap-10 shadow-soft">
+                        <div className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
+                        <div className="absolute -right-10 -bottom-10 h-40 w-40 rounded-full bg-amber-500/10 blur-3xl" />
+                        
+                        <div className="relative inline-flex items-center justify-center shrink-0 drop-shadow-xl">
                             <svg className="h-48 w-48 -rotate-90">
                                 <circle className="text-muted-foreground/10" strokeWidth="12" stroke="currentColor" fill="transparent" r="85" cx="96" cy="96" />
                                 <circle 
@@ -205,16 +212,16 @@ function CalculatorPage() {
                                 />
                             </svg>
                             <div className="absolute flex flex-col items-center">
-                                <span className="text-6xl font-black text-foreground">{result.overallScore}</span>
-                                <span className="text-xs font-bold text-muted-foreground mt-1">/ 100</span>
+                                <span className="text-6xl font-black text-foreground drop-shadow-sm">{result.overallScore}</span>
+                                <span className="text-xs font-bold text-muted-foreground mt-1 tracking-widest uppercase">/ 100</span>
                             </div>
                         </div>
-                        <div className="text-left max-w-sm">
+                        <div className="text-left max-w-sm relative z-10">
                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground mb-2">Overall ATS Match</p>
-                            <h2 className={`text-4xl font-black ${getScoreLabel(result.overallScore).color} mb-3`}>
+                            <h2 className={`text-4xl font-black ${getScoreLabel(result.overallScore).color} mb-3 drop-shadow-sm`}>
                                 {getScoreLabel(result.overallScore).label}
                             </h2>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground leading-relaxed">
                                 Your resume scored a {result.overallScore} based on our deterministic software engineering formula. 
                                 Focus on your subscores on the left to identify specific areas for improvement.
                             </p>
@@ -303,6 +310,7 @@ function CalculatorPage() {
                 </div>
             )}
         </div>
+      </div>
       </div>
       </div>
     </AppShell>

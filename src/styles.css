@@ -164,7 +164,7 @@
   }
 
   .gradient-emerald {
-    background: linear-gradient(135deg, oklch(0.78 0.17 145), oklch(0.7 0.16 165));
+    background-color: #14B688;
   }
   .gradient-soft {
     background: linear-gradient(180deg, oklch(0.99 0.02 145), oklch(0.97 0.04 130));
@@ -172,4 +172,13 @@
   .resume-line {
     @apply h-1.5 rounded-full bg-foreground/10;
   }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 4s ease-in-out infinite;
 }

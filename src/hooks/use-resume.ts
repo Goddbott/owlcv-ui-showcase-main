@@ -93,6 +93,7 @@ export type ResumeData = {
     fontFamily: string;
     padding: number;
   };
+  thumbnail?: string;
 };
 
 const initialData: ResumeData = {
