@@ -294,6 +294,7 @@ function Landing() {
           {[
             { name: "Jake's Template", template: "latex", img: "/assets/Jake.jpg", accent: "slate" as const },
             { name: "IIITA Template", template: "iiita", img: "/assets/IIITA.jpg", accent: "emerald" as const },
+            { name: "Professional", template: "professional", img: "/assets/Professional.png", accent: "indigo" as const },
             { name: "Modern", template: "modern", accent: "emerald" as const },
             { name: "Minimal", template: "minimal", accent: "teal" as const },
           ].map((t, i) => (

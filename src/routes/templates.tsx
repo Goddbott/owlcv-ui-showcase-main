@@ -15,6 +15,7 @@ const filters = ["All", "Modern", "Classic", "Creative", "Minimal"] as const;
 const templates = [
   { name: "Jake's Template", category: "Classic", template: "latex", img: "/assets/Jake.jpg", accent: "slate" as const },
   { name: "IIITA Template", category: "College", template: "iiita", img: "/assets/IIITA.jpg", accent: "emerald" as const },
+  { name: "Professional Template", category: "Modern", template: "professional", img: "/assets/Professional.png", accent: "indigo" as const },
   { name: "Modern Template", category: "Modern", template: "modern", accent: "emerald" as const },
   { name: "Minimal Template", category: "Minimal", template: "minimal", accent: "teal" as const },
 ];
