@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { X, BookOpen, Loader2, Slider, Check, Github } from "lucide-react";
+import { X, BookOpen, Loader2, Check, Github, FolderOpen } from "lucide-react";
 import { summarizeProjectForResume } from "@/lib/gemini";
-
-interface SavedProject {
-  id: string;
-  title: string;
-  description: string[];
-  techStack: string[];
-  repoUrl?: string;
-  importedAt: string;
-}
+import { supabase } from "@/lib/supabase";
+import { getProjects } from "@/server/functions";
 
 interface ProjectLibraryModalProps {
   isOpen: boolean;
@@ -18,18 +11,30 @@ interface ProjectLibraryModalProps {
 }
 
 export function ProjectLibraryModal({ isOpen, onClose, onImport }: ProjectLibraryModalProps) {
-  const [projects, setProjects] = useState<SavedProject[]>([]);
-  const [selectedProject, setSelectedProject] = useState<SavedProject | null>(null);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [selectedProject, setSelectedProject] = useState<any | null>(null);
   const [bulletCount, setBulletCount] = useState<number>(3);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      const saved = localStorage.getItem("owlcv_imported_projects");
-      if (saved) {
-        setProjects(JSON.parse(saved));
+    if (!isOpen) return;
+
+    const fetchProjects = async () => {
+      setLoading(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const data = await getProjects({ data: session.user.id });
+          setProjects(data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
       }
-    }
+      setLoading(false);
+    };
+
+    fetchProjects();
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -39,19 +44,19 @@ export function ProjectLibraryModal({ isOpen, onClose, onImport }: ProjectLibrar
     
     setIsProcessing(true);
     try {
-      const bullets = await summarizeProjectForResume(selectedProject, bulletCount);
+      const description = Array.isArray(selectedProject.description) ? selectedProject.description : [];
+      const techStack = Array.isArray(selectedProject.techStack) ? selectedProject.techStack : [];
+
+      const bullets = await summarizeProjectForResume(
+        { title: selectedProject.title, description, techStack },
+        bulletCount
+      );
       
       onImport({
         name: selectedProject.title,
         url: selectedProject.repoUrl ? (selectedProject.repoUrl.startsWith('http') ? selectedProject.repoUrl : `https://${selectedProject.repoUrl}`) : "",
-        description: bullets.join(". "), // The resume preview expects a string separated by newlines or periods depending on the parser. 
-        techStack: selectedProject.techStack ? selectedProject.techStack.join(", ") : "",
-        // Wait, the Resume Preview `Job` component splits by '.' but the editor has a textarea that takes a single string.
-        // Actually, we should just join them with newlines or periods so the user can edit them in the textarea.
-        // The Job component splits by '.' and trims. So let's join with '.' and space.
-        // Or better, let's look at `AIEnhanceButton.tsx` or how `Job` works. 
-        // `Job` component in editor.$id.tsx: `bullets={exp.description.split('.').filter(b => b.trim()).map(b => b.trim())}`
-        // So joining with '.' is correct.
+        description: bullets.join(". "),
+        techStack: techStack.join(", "),
       });
       onClose();
     } catch (error) {
@@ -83,11 +88,15 @@ export function ProjectLibraryModal({ isOpen, onClose, onImport }: ProjectLibrar
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
-          {projects.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="h-6 w-6 animate-spin rounded-full border-3 border-primary border-t-transparent"></div>
+            </div>
+          ) : projects.length === 0 ? (
             <div className="text-center py-12">
                <BookOpen className="h-10 w-10 mx-auto text-muted-foreground/30 mb-3" />
                <p className="text-sm font-semibold">Your library is empty</p>
-               <p className="text-xs text-muted-foreground mt-1">Go to the GitHub Import tab to add projects.</p>
+               <p className="text-xs text-muted-foreground mt-1">Go to the Project Library to import or add projects first.</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -98,13 +107,15 @@ export function ProjectLibraryModal({ isOpen, onClose, onImport }: ProjectLibrar
                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedProject?.id === proj.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30 hover:bg-surface-2/30'}`}
                  >
                    <div className="flex items-start gap-3">
-                      <Github className="h-5 w-5 mt-0.5 text-muted-foreground" />
+                      {proj.repoUrl ? <Github className="h-5 w-5 mt-0.5 text-muted-foreground" /> : <FolderOpen className="h-5 w-5 mt-0.5 text-muted-foreground" />}
                       <div>
                         <h3 className="text-sm font-bold">{proj.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">{proj.description[0]}</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+                          {Array.isArray(proj.description) && proj.description.length > 0 ? proj.description[0] : ""}
+                        </p>
                         <div className="flex flex-wrap gap-1 mt-3">
-                          {proj.techStack.slice(0, 4).map(t => <span key={t} className="text-[10px] bg-muted px-2 py-0.5 rounded-md text-muted-foreground">{t}</span>)}
-                          {proj.techStack.length > 4 && <span className="text-[10px] bg-muted px-2 py-0.5 rounded-md text-muted-foreground">+{proj.techStack.length - 4}</span>}
+                          {Array.isArray(proj.techStack) && proj.techStack.slice(0, 4).map((t: string) => <span key={t} className="text-[10px] bg-muted px-2 py-0.5 rounded-md text-muted-foreground">{t}</span>)}
+                          {Array.isArray(proj.techStack) && proj.techStack.length > 4 && <span className="text-[10px] bg-muted px-2 py-0.5 rounded-md text-muted-foreground">+{proj.techStack.length - 4}</span>}
                         </div>
                       </div>
                    </div>

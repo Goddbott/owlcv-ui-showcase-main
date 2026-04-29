@@ -71,3 +71,57 @@ export const incrementResumeDownloads = createServerFn({ method: 'POST' })
       },
     });
   });
+
+// ── Project CRUD ──────────────────────────────────────────────
+
+export const getProjects = createServerFn({ method: 'GET' })
+  .inputValidator((userId: string) => userId)
+  .handler(async ({ data: userId }) => {
+    return prisma.project.findMany({
+      where: { user_id: userId },
+      orderBy: { imported_at: 'desc' },
+    });
+  });
+
+export const getProject = createServerFn({ method: 'GET' })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    return prisma.project.findUnique({
+      where: { id },
+    });
+  });
+
+export const createProject = createServerFn({ method: 'POST' })
+  .inputValidator((data: { user_id: string; title: string; description: string[]; techStack: string[]; repoUrl?: string }) => data)
+  .handler(async ({ data }) => {
+    return prisma.project.create({
+      data: {
+        user_id: data.user_id,
+        title: data.title,
+        description: data.description,
+        techStack: data.techStack,
+        repoUrl: data.repoUrl,
+      },
+    });
+  });
+
+export const updateProject = createServerFn({ method: 'POST' })
+  .inputValidator((data: { id: string; title: string; description: string[]; techStack: string[] }) => data)
+  .handler(async ({ data }) => {
+    return prisma.project.update({
+      where: { id: data.id },
+      data: {
+        title: data.title,
+        description: data.description,
+        techStack: data.techStack,
+      },
+    });
+  });
+
+export const deleteProject = createServerFn({ method: 'POST' })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    return prisma.project.delete({
+      where: { id },
+    });
+  });
