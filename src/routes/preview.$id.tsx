@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download } from "lucide-react";
+import { Download, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getResume } from "@/server/functions";
+import { getResume, incrementResumeViews, incrementResumeDownloads } from "@/server/functions";
 import { ResumePreview } from "@/routes/editor.$id";
+import { ShareModal } from "@/components/ShareModal";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/preview/$id")({
   head: () => ({
@@ -18,6 +20,8 @@ function PublicResume() {
   const { id } = Route.useParams();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareLink, setShareLink] = useState("");
 
   useEffect(() => {
     async function loadResume() {
@@ -25,6 +29,17 @@ function PublicResume() {
         const resume = await getResume({ data: id });
         if (resume && resume.content) {
           setData(resume.content);
+          
+          const { data: { session } } = await supabase.auth.getSession();
+          const isOwner = session?.user?.id === resume.user_id;
+
+          if (!isOwner) {
+            try {
+              await incrementResumeViews({ data: id });
+            } catch (err) {
+              console.error("Failed to increment views:", err);
+            }
+          }
         }
       } catch (e) {
         console.error(e);
@@ -40,6 +55,12 @@ function PublicResume() {
     if (!element) return;
 
     try {
+      try {
+        await incrementResumeDownloads({ data: id });
+      } catch (err) {
+        console.error("Failed to increment downloads:", err);
+      }
+
       const iframe = document.createElement('iframe');
       iframe.style.position = 'fixed';
       iframe.style.right = '0';
@@ -101,6 +122,7 @@ function PublicResume() {
           <h1 className="text-2xl font-bold">Resume not found</h1>
           <Link to="/dashboard" className="btn-primary mt-4 inline-flex">Go to Dashboard</Link>
         </div>
+
       </div>
     );
   }
@@ -112,7 +134,18 @@ function PublicResume() {
           <Link to="/dashboard" className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
             ← Back to Dashboard
           </Link>
-          <button onClick={handleDownloadPDF} className="btn-primary px-4 py-2 text-sm shadow-glow"><Download className="h-4 w-4 mr-2 inline" /> Download PDF</button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => {
+                setShareLink(`${window.location.origin}/preview/${id}`);
+                setIsShareModalOpen(true);
+              }}
+              className="btn-outline px-4 py-2 text-sm shadow-sm"
+            >
+              <Share2 className="h-4 w-4 mr-2 inline" /> Share
+            </button>
+            <button onClick={handleDownloadPDF} className="btn-primary px-4 py-2 text-sm shadow-glow"><Download className="h-4 w-4 mr-2 inline" /> Download PDF</button>
+          </div>
         </div>
       </header>
 
@@ -121,6 +154,12 @@ function PublicResume() {
            <ResumePreview data={data} />
          </div>
       </div>
+
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+        link={shareLink} 
+      />
     </div>
   );
 }

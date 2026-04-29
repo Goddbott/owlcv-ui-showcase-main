@@ -9,6 +9,7 @@ import { AIEnhanceButton } from "@/components/AIEnhanceButton";
 import { ProjectLibraryModal } from "@/components/ProjectLibraryModal";
 import { supabase } from "@/lib/supabase";
 import { getResume, createResume, updateResume } from "@/server/functions";
+import { ShareModal } from "@/components/ShareModal";
 
 export const Route = createFileRoute("/editor/$id")({
   head: () => ({ meta: [{ title: "Resume Editor — OwlCV" }, { name: "description", content: "Edit your resume with AI suggestions." }] }),
@@ -58,6 +59,8 @@ function Editor() {
   const [title, setTitle] = useState("Software Engineer Resume");
   const [saving, setSaving] = useState(false);
   const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareLink, setShareLink] = useState("");
   const [splitPercent, setSplitPercent] = useState(38);
   const isDragging = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -393,7 +396,19 @@ function Editor() {
                 <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Live Preview</p>
                 </div>
                 <div className="flex items-center gap-2">
-                <button className="btn-outline px-3 py-1.5 text-[11px]"><Share2 className="h-3.5 w-3.5" /> Share</button>
+                <button 
+                  onClick={() => {
+                    if (id === "new") {
+                      alert("Please save the resume first to share it.");
+                    } else {
+                      setShareLink(`${window.location.origin}/preview/${id}`);
+                      setIsShareModalOpen(true);
+                    }
+                  }}
+                  className="btn-outline px-3 py-1.5 text-[11px]"
+                >
+                  <Share2 className="h-3.5 w-3.5" /> Share
+                </button>
                 <button onClick={handleDownloadPDF} disabled={downloading} className="btn-primary px-3 py-1.5 text-[11px] disabled:opacity-70"><Download className="h-3.5 w-3.5" /> {downloading ? 'Generating...' : 'Download PDF'}</button>
                 </div>
             </div>
@@ -469,6 +484,12 @@ function Editor() {
           </div>
         </div>
       </div>
+
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+        link={shareLink} 
+      />
 
       <ProjectLibraryModal 
         isOpen={isLibraryModalOpen} 

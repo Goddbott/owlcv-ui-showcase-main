@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
 import { supabase } from "@/lib/supabase";
 import { getResumes, deleteResume } from "@/server/functions";
+import { ShareModal } from "@/components/ShareModal";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — OwlCV" }, { name: "description", content: "Manage your resumes and track activity." }] }),
@@ -16,6 +17,8 @@ function Dashboard() {
   const [user, setUser] = useState<any>(null);
   const [resumes, setResumes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shareLink, setShareLink] = useState("");
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchSessionAndData = async () => {
@@ -77,8 +80,8 @@ function Dashboard() {
           {/* Stats Grid */}
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-14">
             <Stat icon={<FileText className="h-5 w-5" />} label="Total Resumes" value={resumes.length.toString()} color="primary" />
-            <Stat icon={<EyeIcon className="h-5 w-5" />} label="Profile Views" value="128" trend="+12%" color="indigo" />
-            <Stat icon={<Download className="h-5 w-5" />} label="Downloads" value="24" trend="+4" color="amber" />
+            <Stat icon={<EyeIcon className="h-5 w-5" />} label="Profile Views" value={resumes.reduce((acc, r) => acc + (r.views || 0), 0).toString()} color="indigo" />
+            <Stat icon={<Download className="h-5 w-5" />} label="Downloads" value={resumes.reduce((acc, r) => acc + (r.downloads || 0), 0).toString()} color="amber" />
             <div className="card-soft relative overflow-hidden p-6 ring-1 ring-border shadow-soft transition-transform hover:-translate-y-1">
               <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-emerald-500/10 blur-xl"></div>
               <div className="relative z-10 flex flex-col h-full justify-between">
@@ -122,13 +125,25 @@ function Dashboard() {
                   <div>
                     <p className="font-bold text-base truncate pr-2">{r.title}</p>
                     <p className="mt-1 text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Updated {new Date(r.updated_at).toLocaleDateString()}</p>
+                    <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><EyeIcon className="h-3.5 w-3.5" /> {r.views || 0}</span>
+                      <span className="flex items-center gap-1"><Download className="h-3.5 w-3.5" /> {r.downloads || 0}</span>
+                    </div>
                   </div>
                   <span className="pill-green whitespace-nowrap">{r.content?.template || "Modern"}</span>
                 </div>
                 <div className="mt-5 grid grid-cols-4 gap-2">
                   <Link to="/editor/$id" params={{ id: r.id }} className="flex h-10 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-primary hover:text-white" title="Edit"><Edit className="h-4 w-4" /></Link>
                   <Link to="/preview/$id" params={{ id: r.id }} className="flex h-10 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-primary hover:text-white" title="Preview"><Eye className="h-4 w-4" /></Link>
-                  <button className="flex h-10 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-primary hover:text-white" title="Share"><Share2 className="h-4 w-4" /></button>
+                  <button 
+                    onClick={() => {
+                      setShareLink(`${window.location.origin}/preview/${r.id}`);
+                      setIsShareModalOpen(true);
+                    }}
+                    className="flex h-10 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-primary hover:text-white" title="Share"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </button>
                   <button 
                     onClick={async () => {
                       if (confirm("Are you sure you want to delete this resume?")) {
@@ -200,6 +215,12 @@ function Dashboard() {
           </Link>
         </div>
       </div>
+
+      <ShareModal 
+        isOpen={isShareModalOpen} 
+        onClose={() => setIsShareModalOpen(false)} 
+        link={shareLink} 
+      />
     </AppShell>
   );
 }
