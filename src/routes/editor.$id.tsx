@@ -438,6 +438,7 @@ function Editor() {
                     >
                         <option value="latex">Jake's Template</option>
                         <option value="iiita">IIITA Template</option>
+                        <option value="professional">Professional</option>
                         <option value="classic">Classic</option>
                     </select>
                 </div>
@@ -1226,6 +1227,194 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                   );
                 })}
               </div>
+            </section>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (template === "professional") {
+    return (
+      <div className="resume-preview-container mx-auto bg-white shadow-2xl" style={wrapperStyles}>
+        <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
+        {/* HEADER — Centered name + contact row with icons */}
+        <div className="text-center mb-1">
+          <h1 className="text-[28px] font-bold uppercase tracking-tight mb-1" style={{ fontVariant: 'small-caps' }}>{personal.fullName}</h1>
+          <div className="text-[10px] flex flex-wrap items-center justify-center gap-1.5 text-slate-700">
+            {[
+              personal.phone && <span key="phone" className="inline-flex items-center gap-0.5">📞 {personal.phone}</span>,
+              personal.email && <span key="email" className="inline-flex items-center gap-0.5">✉️ <a href={`mailto:${personal.email}`} className="underline">{personal.email}</a></span>,
+              personal.email2 && <span key="email2" className="inline-flex items-center gap-0.5">✉️ <a href={`mailto:${personal.email2}`} className="underline">{personal.email2}</a></span>,
+              personal.linkedin && <span key="linkedin" className="inline-flex items-center gap-0.5">🔗 <a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="underline">LinkedIn</a></span>,
+              personal.github && <span key="github" className="inline-flex items-center gap-0.5">💻 <a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`} className="underline">GitHub</a></span>,
+            ].filter(Boolean).map((item, i, arr) => (
+              <span key={i} className="inline-flex items-center gap-1.5">
+                {item}
+                {i < arr.length - 1 && <span>|</span>}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {/* EDUCATION */}
+          {education.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black mb-1 pb-0.5" style={{ fontVariant: 'small-caps' }}>Education</h2>
+              <div className="space-y-1.5">
+                {education.map(edu => (
+                  <div key={edu.id}>
+                    <div className="flex justify-between items-baseline">
+                      <span className="font-bold text-[10.5px]">{edu.institution}</span>
+                      <span className="font-bold text-[10px]">{edu.startYear} — {edu.endYear}</span>
+                    </div>
+                    <div className="flex justify-between items-baseline italic text-[10px] text-slate-700">
+                      <span>{edu.degree}{edu.field ? `, ${edu.field}` : ""}{edu.grade ? ` — ${edu.grade}` : ""}</span>
+                      <span>{edu.location}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* PROFESSIONAL EXPERIENCE */}
+          {experience.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black mb-1 pb-0.5" style={{ fontVariant: 'small-caps' }}>Professional Experience</h2>
+              <div className="space-y-2">
+                {experience.map(exp => (
+                  <div key={exp.id}>
+                    <div className="flex justify-between items-baseline">
+                      <span className="font-bold text-[10.5px]">{exp.company}</span>
+                      <span className="font-bold text-[10px]">{exp.startDate} — {exp.endDate}</span>
+                    </div>
+                    <div className="flex justify-between items-baseline italic text-[10px] text-slate-700 mb-0.5">
+                      <span>{exp.role}</span>
+                      <span>{exp.location}</span>
+                    </div>
+                    <ul className="list-disc pl-4 space-y-0.5 text-[9.5px] leading-snug text-slate-800">
+                      {exp.description.split('.').filter(b => b.trim()).map((b, i) => <li key={i}>{b.trim()}</li>)}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* LEADERSHIP & POSITIONS OF RESPONSIBILITY */}
+          {data.por?.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black mb-1 pb-0.5" style={{ fontVariant: 'small-caps' }}>Leadership & Positions of Responsibility</h2>
+              <div className="space-y-2">
+                {data.por.map(p => (
+                  <div key={p.id}>
+                    <div className="flex justify-between items-baseline">
+                      <span className="font-bold text-[10.5px]">{p.role}</span>
+                      <span className="font-bold text-[10px]">{p.duration}</span>
+                    </div>
+                    <div className="italic text-[10px] text-slate-700 mb-0.5">{p.event}</div>
+                    {p.description && (
+                      <ul className="list-disc pl-4 space-y-0.5 text-[9.5px] leading-snug text-slate-800">
+                        {p.description.split('.').filter(b => b.trim()).map((b, i) => <li key={i}>{b.trim()}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* TECHNICAL PROJECTS */}
+          {projects.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black mb-1 pb-0.5" style={{ fontVariant: 'small-caps' }}>Technical Projects</h2>
+              <div className="space-y-2">
+                {projects.map(proj => (
+                  <div key={proj.id}>
+                    <div className="flex justify-between items-baseline">
+                      <div className="text-[10.5px]">
+                        <span className="font-bold">{proj.name}</span>
+                        {proj.techStack && <span className="italic text-slate-600"> | {proj.techStack}</span>}
+                      </div>
+                      {proj.url && (
+                        <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" className="text-[9.5px] font-bold text-slate-700 hover:underline">
+                          GitHub
+                        </a>
+                      )}
+                    </div>
+                    <ul className="list-disc pl-4 space-y-0.5 text-[9.5px] leading-snug text-slate-800 mt-0.5">
+                      {proj.description.split('.').filter(b => b.trim()).map((b, i) => <li key={i}>{b.trim()}</li>)}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* TECHNICAL COMPETENCIES */}
+          {skills.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black mb-1 pb-0.5" style={{ fontVariant: 'small-caps' }}>Technical Competencies</h2>
+              <div className="space-y-0.5 text-[9.5px] text-slate-800 leading-snug">
+                {skills.map(cat => (
+                  <div key={cat.id}>
+                    <span className="font-bold">{cat.name}: </span>
+                    <span>{cat.items}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* COMPETITIVE PROGRAMMING PROFILES */}
+          {data.codingProfiles?.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black mb-1 pb-0.5" style={{ fontVariant: 'small-caps' }}>Competitive Programming Profiles</h2>
+              <div className="text-[9.5px] text-slate-800 flex flex-wrap gap-x-1">
+                {data.codingProfiles.map((profile, i) => (
+                  <span key={profile.id} className="inline-flex items-center gap-0.5">
+                    {profile.url ? (
+                      <a href={profile.url.startsWith('http') ? profile.url : `https://${profile.url}`} target="_blank" rel="noopener noreferrer" className="font-bold hover:underline">{profile.platform}</a>
+                    ) : (
+                      <span className="font-bold">{profile.platform}</span>
+                    )}
+                    <span>: {profile.rating}</span>
+                    {profile.username && <span className="text-slate-500">({profile.username})</span>}
+                    {i < data.codingProfiles.length - 1 && <span className="mx-1">|</span>}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* CERTIFICATIONS */}
+          {data.certifications?.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black mb-1 pb-0.5" style={{ fontVariant: 'small-caps' }}>Certifications</h2>
+              <div className="space-y-0.5">
+                {data.certifications.map(cert => (
+                  <div key={cert.id} className="flex justify-between items-baseline text-[9.5px] text-slate-800">
+                    <span className="font-bold">{cert.name}{cert.issuer ? ` · ${cert.issuer}` : ""}</span>
+                    <span>{cert.date}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* HONORS & ACHIEVEMENTS */}
+          {data.achievements?.length > 0 && (
+            <section>
+              <h2 className="text-[12px] font-bold uppercase tracking-widest border-b border-black mb-1 pb-0.5" style={{ fontVariant: 'small-caps' }}>Honors & Achievements</h2>
+              <ul className="list-disc pl-4 space-y-0.5 text-[9.5px] leading-snug text-slate-800">
+                {data.achievements.filter(a => a.trim()).map((ach, i) => {
+                  const firstWord = ach.split(' ')[0];
+                  const rest = ach.substring(ach.indexOf(' ') + 1);
+                  return <li key={i}><span className="font-bold">{firstWord}</span> {rest}</li>;
+                })}
+              </ul>
             </section>
           )}
         </div>

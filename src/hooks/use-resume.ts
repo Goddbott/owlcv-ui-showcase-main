@@ -85,7 +85,7 @@ export type ResumeData = {
   achievements: string[];
   codingProfiles: CodingProfile[];
   accentColor: string;
-  template: "modern" | "classic" | "minimal" | "latex" | "iiita";
+  template: "modern" | "classic" | "minimal" | "latex" | "iiita" | "professional";
   settings: {
     fontSize: number;
     lineHeight: number;
