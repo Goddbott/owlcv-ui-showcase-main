@@ -49,3 +49,25 @@ export const updateResume = createServerFn({ method: 'POST' })
       },
     });
   });
+
+export const incrementResumeViews = createServerFn({ method: 'POST' })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    return prisma.resume.update({
+      where: { id },
+      data: {
+        views: { increment: 1 }
+      },
+    });
+  });
+
+export const incrementResumeDownloads = createServerFn({ method: 'POST' })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    return prisma.resume.update({
+      where: { id },
+      data: {
+        downloads: { increment: 1 }
+      },
+    });
+  });

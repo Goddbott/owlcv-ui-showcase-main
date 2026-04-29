@@ -12,6 +12,8 @@ model Resume {
   user_id    String
   title      String
   content    Json
+  views      Int      @default(0)
+  downloads  Int      @default(0)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
