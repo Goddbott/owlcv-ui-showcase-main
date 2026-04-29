@@ -21,7 +21,7 @@ import { Route as ImportProjectRouteImport } from './routes/import-project'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CalculatorRouteImport } from './routes/calculator'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as RUsernameRouteImport } from './routes/r.$username'
+import { Route as PreviewIdRouteImport } from './routes/preview.$id'
 import { Route as EditorIdRouteImport } from './routes/editor.$id'
 
 const UploadRoute = UploadRouteImport.update({
@@ -84,9 +84,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RUsernameRoute = RUsernameRouteImport.update({
-  id: '/r/$username',
-  path: '/r/$username',
+const PreviewIdRoute = PreviewIdRouteImport.update({
+  id: '/preview/$id',
+  path: '/preview/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EditorIdRoute = EditorIdRouteImport.update({
@@ -109,7 +109,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof TemplatesRoute
   '/upload': typeof UploadRoute
   '/editor/$id': typeof EditorIdRoute
-  '/r/$username': typeof RUsernameRoute
+  '/preview/$id': typeof PreviewIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,7 +125,7 @@ export interface FileRoutesByTo {
   '/templates': typeof TemplatesRoute
   '/upload': typeof UploadRoute
   '/editor/$id': typeof EditorIdRoute
-  '/r/$username': typeof RUsernameRoute
+  '/preview/$id': typeof PreviewIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -142,7 +142,7 @@ export interface FileRoutesById {
   '/templates': typeof TemplatesRoute
   '/upload': typeof UploadRoute
   '/editor/$id': typeof EditorIdRoute
-  '/r/$username': typeof RUsernameRoute
+  '/preview/$id': typeof PreviewIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -160,7 +160,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/upload'
     | '/editor/$id'
-    | '/r/$username'
+    | '/preview/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -176,7 +176,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/upload'
     | '/editor/$id'
-    | '/r/$username'
+    | '/preview/$id'
   id:
     | '__root__'
     | '/'
@@ -192,7 +192,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/upload'
     | '/editor/$id'
-    | '/r/$username'
+    | '/preview/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -209,7 +209,7 @@ export interface RootRouteChildren {
   TemplatesRoute: typeof TemplatesRoute
   UploadRoute: typeof UploadRoute
   EditorIdRoute: typeof EditorIdRoute
-  RUsernameRoute: typeof RUsernameRoute
+  PreviewIdRoute: typeof PreviewIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -298,11 +298,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/r/$username': {
-      id: '/r/$username'
-      path: '/r/$username'
-      fullPath: '/r/$username'
-      preLoaderRoute: typeof RUsernameRouteImport
+    '/preview/$id': {
+      id: '/preview/$id'
+      path: '/preview/$id'
+      fullPath: '/preview/$id'
+      preLoaderRoute: typeof PreviewIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/editor/$id': {
@@ -329,7 +329,7 @@ const rootRouteChildren: RootRouteChildren = {
   TemplatesRoute: TemplatesRoute,
   UploadRoute: UploadRoute,
   EditorIdRoute: EditorIdRoute,
-  RUsernameRoute: RUsernameRoute,
+  PreviewIdRoute: PreviewIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

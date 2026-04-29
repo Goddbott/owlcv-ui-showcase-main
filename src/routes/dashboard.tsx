@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppSidebar";
 import { ResumeThumb } from "@/components/ResumeThumb";
 import { supabase } from "@/lib/supabase";
+import { getResumes, deleteResume } from "@/server/functions";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — OwlCV" }, { name: "description", content: "Manage your resumes and track activity." }] }),
@@ -28,14 +29,13 @@ function Dashboard() {
       setUser(session.user);
 
       // Fetch resumes for this user
-      const { data: resumesData, error } = await supabase
-        .from("resumes")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .order("updated_at", { ascending: false });
-
-      if (!error && resumesData) {
-        setResumes(resumesData);
+      try {
+        const resumesData = await getResumes({ data: session.user.id });
+        if (resumesData) {
+          setResumes(resumesData);
+        }
+      } catch (error) {
+        console.error("Failed to fetch resumes:", error);
       }
       
       setLoading(false);
@@ -127,12 +127,12 @@ function Dashboard() {
                 </div>
                 <div className="mt-5 grid grid-cols-4 gap-2">
                   <Link to="/editor/$id" params={{ id: r.id }} className="flex h-10 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-primary hover:text-white" title="Edit"><Edit className="h-4 w-4" /></Link>
-                  <Link to="/r/$username" params={{ username: user?.user_metadata?.username || "user" }} className="flex h-10 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-primary hover:text-white" title="Preview"><Eye className="h-4 w-4" /></Link>
+                  <Link to="/preview/$id" params={{ id: r.id }} className="flex h-10 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-primary hover:text-white" title="Preview"><Eye className="h-4 w-4" /></Link>
                   <button className="flex h-10 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-primary hover:text-white" title="Share"><Share2 className="h-4 w-4" /></button>
                   <button 
                     onClick={async () => {
                       if (confirm("Are you sure you want to delete this resume?")) {
-                        await supabase.from("resumes").delete().eq("id", r.id);
+                        await deleteResume({ data: r.id });
                         setResumes(resumes.filter(res => res.id !== r.id));
                       }
                     }}
