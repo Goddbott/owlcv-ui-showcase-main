@@ -8,6 +8,7 @@ import { useResume, ResumeData, Experience, Project, Education, Certification, S
 import { AIEnhanceButton } from "@/components/AIEnhanceButton";
 import { ProjectLibraryModal } from "@/components/ProjectLibraryModal";
 import { supabase } from "@/lib/supabase";
+import { getResume, createResume, updateResume } from "@/server/functions";
 
 export const Route = createFileRoute("/editor/$id")({
   head: () => ({ meta: [{ title: "Resume Editor — OwlCV" }, { name: "description", content: "Edit your resume with AI suggestions." }] }),
@@ -110,19 +111,23 @@ function Editor() {
         return;
       }
       if (id !== "new") {
-        const { data: resume } = await supabase.from("resumes").select("*").eq("id", id).single();
-        if (resume && resume.content) {
-          setData({
-            ...resume.content,
-            settings: resume.content.settings || {
-              fontSize: 11,
-              lineHeight: 1.5,
-              letterSpacing: 0,
-              fontFamily: "Inter",
-              padding: 32,
-            }
-          });
-          setTitle(resume.title);
+        try {
+          const resume = await getResume({ data: id });
+          if (resume && resume.content) {
+            setData({
+              ...(resume.content as any),
+              settings: (resume.content as any).settings || {
+                fontSize: 11,
+                lineHeight: 1.5,
+                letterSpacing: 0,
+                fontFamily: "Inter",
+                padding: 32,
+              }
+            });
+            setTitle(resume.title);
+          }
+        } catch (error) {
+          console.error("Failed to load resume:", error);
         }
       } else {
         const searchParams = new URLSearchParams(window.location.search);
@@ -164,21 +169,32 @@ function Editor() {
     };
 
     if (id === "new") {
-      const { data: inserted, error } = await supabase.from("resumes").insert({
-        user_id: session.user.id,
-        title,
-        content: dataToSave
-      }).select().single();
-      
-      if (inserted) {
-        router.navigate({ to: `/editor/${inserted.id}` });
+      try {
+        const inserted = await createResume({
+          data: {
+            user_id: session.user.id,
+            title,
+            content: dataToSave
+          }
+        });
+        if (inserted) {
+          router.navigate({ to: `/editor/${inserted.id}` });
+        }
+      } catch (error) {
+        console.error("Failed to save resume:", error);
       }
     } else {
-      await supabase.from("resumes").update({
-        title,
-        content: dataToSave,
-        updated_at: new Date().toISOString()
-      }).eq("id", id);
+      try {
+        await updateResume({
+          data: {
+            id,
+            title,
+            content: dataToSave,
+          }
+        });
+      } catch (error) {
+        console.error("Failed to update resume:", error);
+      }
     }
     setSaving(false);
   };
