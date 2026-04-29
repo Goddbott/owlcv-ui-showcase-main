@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Github, Loader2, Sparkles, Check, AlertCircle, Plus, Terminal, FileText, Trash2, X } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
 import { parseGitHubUrl, fetchRepoInfo, fetchReadme, fetchFileTree } from "@/lib/github-api";
 import { generateProjectEntry, type AIGeneratedProject } from "@/lib/gemini";
+import { supabase } from "@/lib/supabase";
+import { createProject } from "@/server/functions";
 
 export const Route = createFileRoute("/import-project")({
   component: ImportProject,
@@ -15,6 +17,17 @@ function ImportProject() {
   const [status, setStatus] = useState<"idle" | "fetching" | "processing" | "preview" | "saving">("idle");
   const [error, setError] = useState<string | null>(null);
   const [project, setProject] = useState<AIGeneratedProject | null>(null);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate({ to: "/signin" });
+        return;
+      }
+      setUser(session.user);
+    });
+  }, [navigate]);
 
   const handleImport = async () => {
     setError(null);
@@ -42,28 +55,26 @@ function ImportProject() {
     }
   };
 
-  const handleSave = () => {
-    if (!project) return;
+  const handleSave = async () => {
+    if (!project || !user) return;
     setStatus("saving");
     
-    // Get existing projects from localStorage
-    const existingStr = localStorage.getItem("owlcv_imported_projects");
-    const existing = existingStr ? JSON.parse(existingStr) : [];
-    
-    // Add new project
-    const newProject = {
-        ...project,
-        id: Math.random().toString(36).substr(2, 9),
-        importedAt: new Date().toISOString(),
-        repoUrl: url
-    };
-    
-    localStorage.setItem("owlcv_imported_projects", JSON.stringify([newProject, ...existing]));
-    
-    // Simulate save delay
-    setTimeout(() => {
-        navigate({ to: "/dashboard" });
-    }, 800);
+    try {
+      await createProject({
+        data: {
+          user_id: user.id,
+          title: project.title,
+          description: project.description,
+          techStack: project.techStack,
+          repoUrl: url || undefined,
+        },
+      });
+      navigate({ to: "/library" });
+    } catch (err) {
+      console.error("Failed to save project:", err);
+      setError("Failed to save project. Please try again.");
+      setStatus("preview");
+    }
   };
 
   return (
