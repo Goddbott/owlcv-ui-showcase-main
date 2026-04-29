@@ -18,6 +18,10 @@ export function AIEnhanceButton({ currentText, onAccept, type = "experience" }: 
 
     setIsEnhancing(true);
 
+    // Count existing bullets (split by newline)
+    const existingBullets = currentText.split('\n').filter(b => b.trim());
+    const bulletCount = Math.max(1, existingBullets.length);
+
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       if (!apiKey) {
@@ -27,25 +31,36 @@ export function AIEnhanceButton({ currentText, onAccept, type = "experience" }: 
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemma-3-27b-it" });
 
-      const prompt = `You are an expert ATS resume writer. Rewrite the following ${type} description to be a single, professional, impactful, and ATS-friendly line for a resume. Do not include any quotes, explanations, or extra formatting. Just the improved line.\n\nOriginal text: "${currentText}"`;
+      const prompt = bulletCount === 1
+        ? `You are an expert ATS resume writer. Rewrite the following ${type} description to be a single, professional, impactful, and ATS-friendly bullet point for a resume. Start with a strong action verb. Do not include any quotes, explanations, numbering, or extra formatting. Just the improved line.\n\nOriginal text: "${currentText}"`
+        : `You are an expert ATS resume writer. Rewrite the following ${type} description into exactly ${bulletCount} professional, impactful, and ATS-friendly bullet points for a resume. Each bullet must start with a strong action verb. Return each bullet on a new line. Do not include any quotes, numbering, bullet symbols, explanations, or extra formatting. Just ${bulletCount} lines of text.\n\nOriginal text:\n${currentText}`;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text().trim();
       
-      setSuggestedText(text.replace(/^["']|["']$/g, ''));
+      // Clean up: remove leading bullet symbols/numbers, quotes, and extra whitespace
+      const cleaned = text
+        .split('\n')
+        .map(line => line.replace(/^[\s•\-\*\d.)\]]+/, '').trim())
+        .filter(line => line.length > 0)
+        .map(line => line.replace(/^["']|["']$/g, ''))
+        .join('\n');
+
+      setSuggestedText(cleaned);
     } catch (error) {
       console.warn("Falling back to local simulation due to error:", error);
       
       // Fallback Mock AI Improvements
-      let improved = "";
-      if (type === "experience") {
-        improved = `Spearheaded efforts to ${currentText.charAt(0).toLowerCase()}${currentText.slice(1)} This resulted in a significant improvement in efficiency and user satisfaction across the organization.`;
-      } else if (type === "summary") {
-        improved = `Results-oriented professional with extensive experience in ${currentText}. Proven track record of delivering high-impact solutions and driving business growth.`;
-      } else {
-        improved = `Strategically developed ${currentText}, utilizing modern methodologies to ensure scalability and high performance.`;
-      }
+      const improved = existingBullets.map((bullet, i) => {
+        if (type === "experience") {
+          return `Spearheaded efforts to ${bullet.charAt(0).toLowerCase()}${bullet.slice(1).replace(/\.$/, '')}, resulting in significant improvement in efficiency and user satisfaction`;
+        } else if (type === "summary") {
+          return `Results-oriented professional with extensive experience in ${bullet.replace(/\.$/, '')}`;
+        } else {
+          return `Strategically developed ${bullet.replace(/\.$/, '')}, utilizing modern methodologies to ensure scalability and high performance`;
+        }
+      }).join('\n');
   
       setSuggestedText(improved);
     } finally {

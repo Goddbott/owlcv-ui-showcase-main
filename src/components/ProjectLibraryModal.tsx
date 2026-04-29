@@ -55,7 +55,7 @@ export function ProjectLibraryModal({ isOpen, onClose, onImport }: ProjectLibrar
       onImport({
         name: selectedProject.title,
         url: selectedProject.repoUrl ? (selectedProject.repoUrl.startsWith('http') ? selectedProject.repoUrl : `https://${selectedProject.repoUrl}`) : "",
-        description: bullets.join(". "),
+        description: bullets.join("\n"),
         techStack: techStack.join(", "),
       });
       onClose();
