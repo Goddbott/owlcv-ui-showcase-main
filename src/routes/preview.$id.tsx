@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getResume, incrementResumeViews, incrementResumeDownloads } from "@/server/functions";
 import { ResumePreview } from "@/routes/editor.$id";
 import { ShareModal } from "@/components/ShareModal";
+import { supabase } from "@/lib/supabase";
 
 export const Route = createFileRoute("/preview/$id")({
   head: () => ({
@@ -28,10 +29,16 @@ function PublicResume() {
         const resume = await getResume({ data: id });
         if (resume && resume.content) {
           setData(resume.content);
-          try {
-            await incrementResumeViews({ data: id });
-          } catch (err) {
-            console.error("Failed to increment views:", err);
+          
+          const { data: { session } } = await supabase.auth.getSession();
+          const isOwner = session?.user?.id === resume.user_id;
+
+          if (!isOwner) {
+            try {
+              await incrementResumeViews({ data: id });
+            } catch (err) {
+              console.error("Failed to increment views:", err);
+            }
           }
         }
       } catch (e) {
