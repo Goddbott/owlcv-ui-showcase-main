@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { ArrowLeft, Camera, Sparkles, Plus, Download, Share2, ChevronRight, ChevronLeft, X, Trash2, Save, BookOpen, ZoomIn, ZoomOut, Edit } from "lucide-react";
 import { AppShell } from "@/components/AppSidebar";
@@ -10,9 +10,10 @@ import { ProjectLibraryModal } from "@/components/ProjectLibraryModal";
 import { supabase } from "@/lib/supabase";
 import { getResume, createResume, updateResume } from "@/server/functions";
 import { ShareModal } from "@/components/ShareModal";
+import { formatDateRange } from "@/lib/date";
 
 export const Route = createFileRoute("/editor/$id")({
-  head: () => ({ meta: [{ title: "Resume Editor â€” OwlCV" }, { name: "description", content: "Edit your resume with AI suggestions." }] }),
+  head: () => ({ meta: [{ title: "Resume Editor — OwlCV" }, { name: "description", content: "Edit your resume with AI suggestions." }] }),
   component: Editor,
 });
 
@@ -843,7 +844,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
           {(personal.course || personal.rollNo) && (
              <div className="text-[12px] mb-2 font-medium">
                 {personal.course && <span>{personal.course}</span>}
-                {personal.course && personal.rollNo && <span> Â· </span>}
+                {personal.course && personal.rollNo && <span> · </span>}
                 {personal.rollNo && <span>Roll No: {personal.rollNo}</span>}
              </div>
           )}
@@ -899,7 +900,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                     </div>
                     <div className="flex justify-between items-baseline italic text-[11px]">
                       <span>{edu.degree}{edu.field ? `, ${edu.field}` : ""} {edu.grade ? `(${edu.grade})` : ""}</span>
-                      <span>{edu.startYear} â€” {edu.endYear}</span>
+                      <span>{edu.startYear} — {edu.endYear}</span>
                     </div>
                   </div>
                 ))}
@@ -916,7 +917,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                   <div key={exp.id}>
                     <div className="flex justify-between items-baseline">
                       <span className="font-bold text-[11px]">{exp.role}</span>
-                      <span className="text-[11px]">{exp.startDate} â€” {exp.endDate}</span>
+                      <span className="text-[11px]">{formatDateRange(exp.startDate, exp.endDate)}</span>
                     </div>
                     <div className="flex justify-between items-baseline italic text-[11px] mb-1">
                       <span>{exp.company}</span>
@@ -940,7 +941,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
               <div className="space-y-1">
                 {data.certifications.map(cert => (
                   <div key={cert.id} className="flex justify-between items-baseline text-[10px] text-slate-700">
-                    <span className="font-bold">{cert.name}{cert.issuer ? ` Â· ${cert.issuer}` : ""}</span>
+                    <span className="font-bold">{cert.name}{cert.issuer ? ` · ${cert.issuer}` : ""}</span>
                     <span>{cert.date}</span>
                   </div>
                 ))}
@@ -955,7 +956,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-slate-700">
                 {data.codingProfiles.map((profile, i) => (
                   <div key={profile.id} className="flex items-center gap-1.5">
-                    <span className="text-slate-900">â€¢</span>
+                    <span className="text-slate-900">•</span>
                     <span className="font-bold">{profile.rating} on {profile.platform}</span>
                     {profile.username && (
                       profile.url ? (
@@ -981,7 +982,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                       <span className="font-bold text-[11px]">{proj.name}</span>
                       {proj.url && (
                         <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 hover:underline">
-                          {proj.url.replace(/^https?:\/\/(www\.)?/, '')}
+                          Project Link
                         </a>
                       )}
                     </div>
@@ -1069,7 +1070,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
               <img src={personal.collegeLogo} className="w-full object-contain" alt="College Logo" />
             </div>
           )}
-          <div className="flex-1 flex justify-between items-start text-[11px] leading-snug font-serif">
+          <div className="flex-1 flex justify-between items-start text-[11px] leading-snug">
             <div className="flex flex-col gap-0.5">
               <span className="text-[20px] font-bold tracking-wide">{personal.fullName}</span>
               {personal.rollNo && <span>Roll No.: {personal.rollNo}</span>}
@@ -1088,7 +1089,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
           </div>
         </div>
 
-        <div className="space-y-3 font-serif">
+        <div className="space-y-3">
           {/* EDUCATION */}
           {education.length > 0 && (
             <section>
@@ -1102,7 +1103,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                     </div>
                     <div className="flex justify-between items-baseline italic mb-0.5">
                       <span>{edu.degree}{edu.field ? `, ${edu.field}` : ""}</span>
-                      <span>{edu.startYear} â€” {edu.endYear}</span>
+                      <span>{formatDateRange(edu.startYear, edu.endYear)}</span>
                     </div>
                     {edu.location && <div className="text-[10px] italic text-slate-600">{edu.location}</div>}
                   </div>
@@ -1124,7 +1125,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                     </div>
                     <div className="flex justify-between items-baseline italic mb-0.5">
                       <span>{exp.role}</span>
-                      <span>{exp.startDate} â€” {exp.endDate}</span>
+                      <span>{formatDateRange(exp.startDate, exp.endDate)}</span>
                     </div>
                     <ul className="list-disc pl-4 space-y-0.5">
                       {exp.description.split('\n').filter(b => b.trim()).map((b, i) => <li key={i}>{b.trim()}</li>)}
@@ -1142,7 +1143,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
               <div className="space-y-0.5">
                 {data.certifications.map(cert => (
                   <div key={cert.id} className="flex justify-between items-baseline text-[11px]">
-                    <span className="font-bold">{cert.name}{cert.issuer ? ` Â· ${cert.issuer}` : ""}</span>
+                    <span className="font-bold">{cert.name}{cert.issuer ? ` · ${cert.issuer}` : ""}</span>
                     <span className="italic text-[10px]">{cert.date}</span>
                   </div>
                 ))}
@@ -1163,7 +1164,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                     <div key={proj.id} className="text-[11px] leading-tight">
                       <div className="flex justify-between items-baseline">
                         <span className="font-bold">{proj.name}</span>
-                        {proj.url && <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} className="italic">{proj.url.replace(/^https?:\/\/(www\.)?/, '')}</a>}
+                        {proj.url && <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" className="italic">Project Link</a>}
                       </div>
                       <div className="italic mb-0.5">{subtitle}</div>
                       <ul className="list-disc pl-4 space-y-0.5">
@@ -1259,16 +1260,16 @@ export function ResumePreview({ data }: { data: ResumeData }) {
     return (
       <div className="resume-preview-container mx-auto bg-white shadow-2xl" style={wrapperStyles}>
         <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
-        {/* HEADER â€” Centered name + contact row with icons */}
+        {/* HEADER — Centered name + contact row with icons */}
         <div className="text-center mb-1">
           <h1 className="text-[28px] font-bold uppercase tracking-tight mb-1" style={{ fontVariant: 'small-caps' }}>{personal.fullName}</h1>
           <div className="text-[10px] flex flex-wrap items-center justify-center gap-1.5 text-slate-700">
             {[
-              personal.phone && <span key="phone" className="inline-flex items-center gap-0.5">ðŸ“ž {personal.phone}</span>,
-              personal.email && <span key="email" className="inline-flex items-center gap-0.5">âœ‰ï¸ <a href={`mailto:${personal.email}`} className="underline">{personal.email}</a></span>,
-              personal.email2 && <span key="email2" className="inline-flex items-center gap-0.5">âœ‰ï¸ <a href={`mailto:${personal.email2}`} className="underline">{personal.email2}</a></span>,
-              personal.linkedin && <span key="linkedin" className="inline-flex items-center gap-0.5">ðŸ”— <a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="underline">LinkedIn</a></span>,
-              personal.github && <span key="github" className="inline-flex items-center gap-0.5">ðŸ’» <a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`} className="underline">GitHub</a></span>,
+              personal.phone && <span key="phone" className="inline-flex items-center gap-0.5">📞 {personal.phone}</span>,
+              personal.email && <span key="email" className="inline-flex items-center gap-0.5">✉️ <a href={`mailto:${personal.email}`} className="underline">{personal.email}</a></span>,
+              personal.email2 && <span key="email2" className="inline-flex items-center gap-0.5">✉️ <a href={`mailto:${personal.email2}`} className="underline">{personal.email2}</a></span>,
+              personal.linkedin && <span key="linkedin" className="inline-flex items-center gap-0.5">🔗 <a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="underline">LinkedIn</a></span>,
+              personal.github && <span key="github" className="inline-flex items-center gap-0.5">💻 <a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`} className="underline">GitHub</a></span>,
             ].filter(Boolean).map((item, i, arr) => (
               <span key={i} className="inline-flex items-center gap-1.5">
                 {item}
@@ -1288,10 +1289,10 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                   <div key={edu.id}>
                     <div className="flex justify-between items-baseline">
                       <span className="font-bold text-[10.5px]">{edu.institution}</span>
-                      <span className="font-bold text-[10px]">{edu.startYear} â€” {edu.endYear}</span>
+                      <span className="font-bold text-[10px]">{formatDateRange(edu.startYear, edu.endYear)}</span>
                     </div>
                     <div className="flex justify-between items-baseline italic text-[10px] text-slate-700">
-                      <span>{edu.degree}{edu.field ? `, ${edu.field}` : ""}{edu.grade ? ` â€” ${edu.grade}` : ""}</span>
+                      <span>{edu.degree}{edu.field ? `, ${edu.field}` : ""}{edu.grade ? ` — ${edu.grade}` : ""}</span>
                       <span>{edu.location}</span>
                     </div>
                   </div>
@@ -1309,7 +1310,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                   <div key={exp.id}>
                     <div className="flex justify-between items-baseline">
                       <span className="font-bold text-[10.5px]">{exp.company}</span>
-                      <span className="font-bold text-[10px]">{exp.startDate} â€” {exp.endDate}</span>
+                      <span className="font-bold text-[10px]">{formatDateRange(exp.startDate, exp.endDate)}</span>
                     </div>
                     <div className="flex justify-between items-baseline italic text-[10px] text-slate-700 mb-0.5">
                       <span>{exp.role}</span>
@@ -1361,7 +1362,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                       </div>
                       {proj.url && (
                         <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" className="text-[9.5px] font-bold text-slate-700 hover:underline">
-                          GitHub
+                          Project Link
                         </a>
                       )}
                     </div>
@@ -1417,7 +1418,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
               <div className="space-y-0.5">
                 {data.certifications.map(cert => (
                   <div key={cert.id} className="flex justify-between items-baseline text-[9.5px] text-slate-800">
-                    <span className="font-bold">{cert.name}{cert.issuer ? ` Â· ${cert.issuer}` : ""}</span>
+                    <span className="font-bold">{cert.name}{cert.issuer ? ` · ${cert.issuer}` : ""}</span>
                     <span>{cert.date}</span>
                   </div>
                 ))}
@@ -1451,17 +1452,17 @@ export function ResumePreview({ data }: { data: ResumeData }) {
              <h1 className="text-4xl font-light tracking-tight">{personal.fullName}</h1>
              {(personal.course || personal.rollNo) && (
                 <div className="mt-2 text-xs text-slate-500 font-medium tracking-wide">
-                   {personal.course} {personal.course && personal.rollNo && 'Â·'} {personal.rollNo && `Roll No: ${personal.rollNo}`}
+                   {personal.course} {personal.course && personal.rollNo && '·'} {personal.rollNo && `Roll No: ${personal.rollNo}`}
                 </div>
              )}
              <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-[10px] text-slate-400">
                 {personal.email && <span>{personal.email}</span>}
-                {personal.email2 && <><span>â€¢</span><span>{personal.email2}</span></>}
-                {personal.location && <><span>â€¢</span><span>{personal.location}</span></>}
-                {personal.phone && <><span>â€¢</span><span>{personal.phone}</span></>}
-                {personal.linkedin && <><span>â€¢</span><a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="hover:underline">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
-                {personal.github && <><span>â€¢</span><a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`} className="hover:underline">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
-                {personal.portfolio && <><span>â€¢</span><a href={personal.portfolio.startsWith('http') ? personal.portfolio : `https://${personal.portfolio}`} className="hover:underline">{personal.portfolio.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
+                {personal.email2 && <><span>•</span><span>{personal.email2}</span></>}
+                {personal.location && <><span>•</span><span>{personal.location}</span></>}
+                {personal.phone && <><span>•</span><span>{personal.phone}</span></>}
+                {personal.linkedin && <><span>•</span><a href={personal.linkedin.startsWith('http') ? personal.linkedin : `https://${personal.linkedin}`} className="hover:underline">{personal.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
+                {personal.github && <><span>•</span><a href={personal.github.startsWith('http') ? personal.github : `https://${personal.github}`} className="hover:underline">{personal.github.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
+                {personal.portfolio && <><span>•</span><a href={personal.portfolio.startsWith('http') ? personal.portfolio : `https://${personal.portfolio}`} className="hover:underline">{personal.portfolio.replace(/^https?:\/\/(www\.)?/, '')}</a></>}
              </div>
           </div>
           
@@ -1474,9 +1475,9 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                           <div key={edu.id}>
                               <div className="flex justify-between items-baseline mb-1">
                                   <h3 className="text-sm font-bold">{edu.degree}</h3>
-                                  <span className="text-[10px] text-slate-400">{edu.startYear} â€” {edu.endYear}</span>
+                                  <span className="text-[10px] text-slate-400">{formatDateRange(edu.startYear, edu.endYear)}</span>
                               </div>
-                              <p className="text-xs text-slate-600">{edu.institution}{edu.location ? ` Â· ${edu.location}` : ""}{edu.grade ? ` Â· Grade: ${edu.grade}` : ""}</p>
+                              <p className="text-xs text-slate-600">{edu.institution}{edu.location ? ` · ${edu.location}` : ""}{edu.grade ? ` · Grade: ${edu.grade}` : ""}</p>
                           </div>
                       ))}
                    </div>
@@ -1490,9 +1491,9 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                         <div key={exp.id}>
                             <div className="flex justify-between items-baseline mb-1">
                                 <h3 className="text-sm font-bold">{exp.role}</h3>
-                                <span className="text-[10px] text-slate-400">{exp.startDate} â€” {exp.endDate}</span>
+                                <span className="text-[10px] text-slate-400">{formatDateRange(exp.startDate, exp.endDate)}</span>
                             </div>
-                            <p className="text-xs text-slate-600 mb-2">{exp.company}{exp.location ? ` Â· ${exp.location}` : ""}</p>
+                            <p className="text-xs text-slate-600 mb-2">{exp.company}{exp.location ? ` · ${exp.location}` : ""}</p>
                             <p className="text-[11px] leading-relaxed text-slate-500">{exp.description}</p>
                         </div>
                     ))}
@@ -1505,7 +1506,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                    <div className="space-y-3">
                       {data.certifications.map(cert => (
                          <div key={cert.id} className="flex justify-between items-baseline">
-                            <p className="text-[11px] font-bold text-slate-700">{cert.name}{cert.issuer ? ` Â· ${cert.issuer}` : ""}</p>
+                            <p className="text-[11px] font-bold text-slate-700">{cert.name}{cert.issuer ? ` · ${cert.issuer}` : ""}</p>
                             <p className="text-[10px] text-slate-400">{cert.date}</p>
                          </div>
                       ))}
@@ -1535,7 +1536,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                           <div key={proj.id}>
                               <div className="flex justify-between items-baseline mb-1">
                                   <h3 className="text-sm font-bold">{proj.name}</h3>
-                                  {proj.url && <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-400 hover:underline">{proj.url.replace(/^https?:\/\/(www\.)?/, '')}</a>}
+                                  {proj.url && <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-400 hover:underline">Project Link</a>}
                               </div>
                               {proj.techStack && <p className="text-[10px] text-slate-500 mb-1"><span className="font-bold text-slate-700">Technology Stack:</span> {proj.techStack}</p>}
                               <p className="text-[11px] leading-relaxed text-slate-500">{proj.description}</p>
@@ -1588,7 +1589,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                    <h1 className="text-xl font-bold text-left leading-tight">{personal.fullName}</h1>
                    {(personal.course || personal.rollNo) && (
                       <p className="text-[11px] text-slate-500 mt-1 leading-snug">
-                         {personal.course} {personal.course && personal.rollNo && 'Â·'} {personal.rollNo && `Roll No: ${personal.rollNo}`}
+                         {personal.course} {personal.course && personal.rollNo && '·'} {personal.rollNo && `Roll No: ${personal.rollNo}`}
                       </p>
                    )}
                 </div>
@@ -1638,13 +1639,13 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                 </div>
                 <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-500 font-medium">
                     <span>{personal.email}</span>
-                    <span>â€¢</span>
+                    <span>•</span>
                     <span>{personal.phone}</span>
-                    <span>â€¢</span>
+                    <span>•</span>
                     <span>{personal.location}</span>
                     {personal.linkedin && (
                         <>
-                            <span>â€¢</span>
+                            <span>•</span>
                             <span>{personal.linkedin}</span>
                         </>
                     )}
@@ -1657,9 +1658,9 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                 <Section title="Education" accentColor={accentStyles.color}>
                     {education.map(edu => (
                         <div key={edu.id} className="flex justify-between items-baseline">
-                             <p className="text-xs font-bold">{edu.degree} Â· <span className="font-semibold text-slate-600">{edu.institution}</span> {edu.grade && <span className="font-normal text-slate-500">({edu.grade})</span>}</p>
+                             <p className="text-xs font-bold">{edu.degree} · <span className="font-semibold text-slate-600">{edu.institution}</span> {edu.grade && <span className="font-normal text-slate-500">({edu.grade})</span>}</p>
                              <div className="text-right">
-                                 <p className="text-[10px] text-slate-500">{edu.startYear} â€” {edu.endYear}</p>
+                                 <p className="text-[10px] text-slate-500">{formatDateRange(edu.startYear, edu.endYear)}</p>
                                  <p className="text-[9px] text-slate-400 italic">{edu.location}</p>
                               </div>
                         </div>
@@ -1674,7 +1675,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                       role={exp.role} 
                       company={exp.company} 
                       location={exp.location}
-                      date={`${exp.startDate} â€” ${exp.endDate}`} 
+                      date={formatDateRange(exp.startDate, exp.endDate)} 
                       bullets={exp.description.split('\n').filter(b => b.trim()).map(b => b.trim())} 
                     />
                 ))}
@@ -1685,7 +1686,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                     <div className="space-y-2">
                         {data.certifications.map(cert => (
                             <div key={cert.id} className="flex justify-between items-baseline">
-                                <p className="text-xs font-bold text-slate-800">{cert.name} Â· <span className="font-medium text-slate-500">{cert.issuer}</span></p>
+                                <p className="text-xs font-bold text-slate-800">{cert.name} · <span className="font-medium text-slate-500">{cert.issuer}</span></p>
                                 <p className="text-[10px] text-slate-500">{cert.date}</p>
                             </div>
                         ))}
@@ -1721,7 +1722,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                          <Job 
                           key={proj.id}
                           role={proj.name} 
-                          company={proj.url && <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" style={{ color: accentStyles.color }} className="text-[10px] hover:underline hover:opacity-80 transition-opacity">View Project</a>} 
+                          company={proj.url && <a href={proj.url.startsWith('http') ? proj.url : `https://${proj.url}`} target="_blank" rel="noopener noreferrer" style={{ color: accentStyles.color }} className="text-[10px] hover:underline hover:opacity-80 transition-opacity">Project Link</a>} 
                           date="" 
                           techStack={proj.techStack}
                           bullets={proj.description.split('\n').filter(b => b.trim()).map(b => b.trim())} 
@@ -1749,7 +1750,7 @@ export function ResumePreview({ data }: { data: ResumeData }) {
                         {data.por.map(p => (
                             <div key={p.id}>
                                 <div className="flex justify-between items-baseline">
-                                    <p className="text-xs font-bold text-slate-800">{p.role}{p.role && p.event ? ' Â· ' : ''}<span className="font-medium text-slate-500">{p.event}</span></p>
+                                    <p className="text-xs font-bold text-slate-800">{p.role}{p.role && p.event ? ' · ' : ''}<span className="font-medium text-slate-500">{p.event}</span></p>
                                     <p className="text-[10px] text-slate-500">{p.duration}</p>
                                 </div>
                                 {p.description && (
@@ -1792,7 +1793,7 @@ function Job({ role, company, location, date, techStack, bullets }: { role: stri
     <div>
       <div className="flex items-baseline justify-between">
         <p className="text-xs font-bold">
-          {role} {company && <>Â· <span className="font-semibold text-slate-600">{company}</span></>}
+          {role} {company && <>· <span className="font-semibold text-slate-600">{company}</span></>}
         </p>
         <p className="text-[10px] text-slate-500 font-medium">{date}</p>
       </div>

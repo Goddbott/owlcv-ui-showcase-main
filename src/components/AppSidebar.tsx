@@ -1,11 +1,12 @@
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Github, BookOpen, Zap, LayoutTemplate, Sparkles, Settings, LogOut, Menu, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { LayoutDashboard, Github, BookOpen, Zap, LayoutTemplate, Sparkles, Settings, LogOut, Menu, X, ChevronLeft, ChevronRight, Wand2 } from "lucide-react";
 import { Logo } from "./Logo";
 import { supabase } from "@/lib/supabase";
 
 const items = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
+  { label: "Magic Import", to: "/ai-import", icon: Wand2 },
   { label: "GitHub Import", to: "/import-project", icon: Github },
   { label: "My Library", to: "/library", icon: BookOpen },
   { label: "ATS Calculator", to: "/calculator", icon: Zap },
