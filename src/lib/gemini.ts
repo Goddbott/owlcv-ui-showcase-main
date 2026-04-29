@@ -206,3 +206,69 @@ Respond ONLY with a raw JSON object (no markdown, no backticks) in the following
     };
   }
 }
+export async function parseResumeWithAI(resumeText: string): Promise<any> {
+  const prompt = `
+You are an expert resume parser. I will provide you with the raw text extracted from a resume.
+Your task is to parse this text and return a structured JSON object matching the following ResumeData interface.
+
+Resume Text:
+${resumeText.substring(0, 8000)}
+
+Rules:
+1. Return ONLY a valid JSON object. No markdown, no code blocks.
+2. If a field is missing, use empty strings or empty arrays.
+3. For IDs, generate short unique strings (e.g., "id1", "id2").
+4. Experience and Education should be chronological (newest first).
+5. Skills should be categorized (e.g., "Languages", "Frameworks").
+6. The output must be valid JSON.
+
+Target JSON Structure:
+{
+  "personal": {
+    "fullName": "", "email": "", "phone": "", "location": "", "linkedin": "", "github": "", "portfolio": "", "rollNo": "", "course": ""
+  },
+  "experience": [
+    { "id": "", "company": "", "role": "", "startDate": "", "endDate": "", "description": "", "location": "", "isCurrent": false }
+  ],
+  "education": [
+    { "id": "", "degree": "", "institution": "", "field": "", "grade": "", "startYear": "", "endYear": "", "location": "" }
+  ],
+  "skills": [
+    { "id": "", "name": "Category Name", "items": "Skill 1, Skill 2, ..." }
+  ],
+  "projects": [
+    { "id": "", "name": "", "url": "", "techStack": "", "description": "" }
+  ],
+  "certifications": [
+    { "id": "", "name": "", "issuer": "", "date": "" }
+  ],
+  "achievements": [],
+  "codingProfiles": [
+    { "id": "", "platform": "", "username": "", "rating": "", "url": "" }
+  ],
+  "por": [
+    { "id": "", "role": "", "event": "", "duration": "", "description": "" }
+  ],
+  "template": "latex",
+  "accentColor": "slate",
+  "settings": {
+    "fontSize": 10,
+    "lineHeight": 1.4,
+    "letterSpacing": 0,
+    "fontFamily": "Inter",
+    "padding": 32
+  }
+}
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    return JSON.parse(cleanedText);
+  } catch (error) {
+    console.error("Error parsing resume with AI:", error);
+    throw new Error("Failed to parse resume content with AI.");
+  }
+}

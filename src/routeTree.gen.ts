@@ -20,6 +20,7 @@ import { Route as LibraryRouteImport } from './routes/library'
 import { Route as ImportProjectRouteImport } from './routes/import-project'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CalculatorRouteImport } from './routes/calculator'
+import { Route as AiImportRouteImport } from './routes/ai-import'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PreviewIdRouteImport } from './routes/preview.$id'
 import { Route as EditorIdRouteImport } from './routes/editor.$id'
@@ -79,6 +80,11 @@ const CalculatorRoute = CalculatorRouteImport.update({
   path: '/calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiImportRoute = AiImportRouteImport.update({
+  id: '/ai-import',
+  path: '/ai-import',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -97,6 +103,7 @@ const EditorIdRoute = EditorIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-import': typeof AiImportRoute
   '/calculator': typeof CalculatorRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-import': typeof AiImportRoute
   '/calculator': typeof CalculatorRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
@@ -130,6 +138,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-import': typeof AiImportRoute
   '/calculator': typeof CalculatorRoute
   '/dashboard': typeof DashboardRoute
   '/import-project': typeof ImportProjectRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai-import'
     | '/calculator'
     | '/dashboard'
     | '/import-project'
@@ -164,6 +174,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai-import'
     | '/calculator'
     | '/dashboard'
     | '/import-project'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/ai-import'
     | '/calculator'
     | '/dashboard'
     | '/import-project'
@@ -197,6 +209,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiImportRoute: typeof AiImportRoute
   CalculatorRoute: typeof CalculatorRoute
   DashboardRoute: typeof DashboardRoute
   ImportProjectRoute: typeof ImportProjectRoute
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-import': {
+      id: '/ai-import'
+      path: '/ai-import'
+      fullPath: '/ai-import'
+      preLoaderRoute: typeof AiImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -317,6 +337,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiImportRoute: AiImportRoute,
   CalculatorRoute: CalculatorRoute,
   DashboardRoute: DashboardRoute,
   ImportProjectRoute: ImportProjectRoute,
