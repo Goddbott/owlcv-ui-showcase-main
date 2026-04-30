@@ -86,7 +86,16 @@ function PublicResume() {
             <style>
               @page { size: A4; margin: 0; }
               body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-              .resume-preview-container { box-shadow: none !important; border: none !important; }
+              .resume-preview-container { box-shadow: none !important; border: none !important; margin: 0 !important; }
+              * { 
+                filter: none !important; 
+                backdrop-filter: none !important; 
+                transform: none !important; 
+                mix-blend-mode: normal !important; 
+                box-shadow: none !important;
+                text-shadow: none !important;
+                opacity: 1 !important;
+              }
             </style>
           </head>
           <body>${element.innerHTML}</body>
