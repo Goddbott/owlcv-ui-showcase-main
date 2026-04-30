@@ -1,21 +1,24 @@
 # 🦉 OwlCV — Smart Resume Builder
 
-![OwlCV Homepage Screenshot Placeholder](public/screenshot-home.png)
-<!-- Replace the path above with your actual homepage screenshot path -->
+<img width="1909" height="967" alt="image" src="https://github.com/user-attachments/assets/178333c9-a704-40d4-a4b9-7433c50511e5" />
 
+<!-- Replace the path above with your actual homepage screenshot path -->
+<br>
 OwlCV is a comprehensive, modern full-stack web application engineered to solve the most common challenges in job hunting. By combining an intuitive, real-time dynamic resume builder with advanced AI integrations, OwlCV helps users effortlessly craft professional, highly optimized, ATS-friendly resumes. Beyond just document generation, it serves as a central hub for developers to manage their project portfolios, automatically parse existing documents, and gain actionable insights into how their applications align with specific job descriptions. Whether you are a fresh graduate or an experienced professional, OwlCV provides all the tools needed to stand out to recruiters and tracking systems alike.
 
 ## ✨ Key Features
 
 *   **AI-Powered Enhancements:** Integrated with Google Gemini AI to optimize your experience descriptions for Applicant Tracking Systems (ATS).
-    <br>![ATS Scoring Screenshot Placeholder](public/screenshot-ats.png)
-*   **Smart Document Parsing:** Import existing resumes (PDF/Word) using `pdf.js` and `mammoth` to automatically populate your profile.
-*   **Project Portfolio Management:** Save, manage, and track your development projects in a centralized database.
+    <br>
+    <img width="1919" height="963" alt="image" src="https://github.com/user-attachments/assets/45c38c76-912c-409f-a57b-b3475a289fd6" />
+*   **Smart Document Parsing:** Import existing resumes (PDF/Word) using `pdf.js` and `mammoth` to automatically populate your profile.<br>
+*   **Project Portfolio Management:** Save, manage, and track your development projects in a centralized database.<br>
 *   **Dynamic Resume Editor:** Build and preview your resume in real-time.
-    <br>![Resume Editor Screenshot Placeholder](public/screenshot-editor.png)
-*   **PDF Export:** High-fidelity PDF rendering using `html2canvas` and `html2pdf.js` to ensure your resume looks exactly as designed.
-*   **Secure Authentication:** User sign-up, login, and OAuth (Google/GitHub) powered by Supabase.
-*   **Responsive & Beautiful UI:** Styled with Tailwind CSS v4 and animated with Framer Motion for a premium user experience.
+    <br>
+    <img width="1919" height="969" alt="image" src="https://github.com/user-attachments/assets/1f36a426-6f64-4e88-967d-99594c481692" />
+*   **PDF Export:** High-fidelity PDF rendering using `html2canvas` and `html2pdf.js` to ensure your resume looks exactly as designed.<br>
+*   **Secure Authentication:** User sign-up, login, and OAuth (Google/GitHub) powered by Supabase.<br>
+*   **Responsive & Beautiful UI:** Styled with Tailwind CSS v4 and animated with Framer Motion for a premium user experience.<br>
 
 ## 🛠️ Tech Stack
 
